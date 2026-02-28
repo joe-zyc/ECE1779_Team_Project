@@ -2,6 +2,9 @@ ECE1779 - Winter 2026
 Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 
 # Motivation
+The current used car market is highly fragmented and often inefficient for individual buyers and sellers. Many existing car trading platforms are saturated with private dealers, excessive advertisements, potential scams, and high service fees. Most systems focus only on transactions and do not support structures, long-term vehicle record management. In addition, car owners lack a centralized system to store vehicle profiles (make, model, year, VIN), track mileage and expenses, and maintain organized records for resale. Buyers also face limited filtering flexibility when searching for vehicles by brand, year, type, mileage, price, or color. These gaps reduce transparency, trust, and decision-making efficiency. This project proposes a cloud-native car management and trading platform that integrates structured vehicle lifecycle tracking with a searchable used-car marketplace. The target users are adults who are either seeking to purchase a used vehicle or looking to sell their current one. 
+
+The platform improves transparency by allowing sellers to create detailed listings with photos and structured vehicle data, while enabling buyers to filter vehicles across multiple dimensions. It also supports long-term vehicle management beyond a single transaction. The system is built using a stateful cloud-native architecture with containerized services (Docker Swarm), PostgreSQL for persistent structured data, attached cloud volumes for image storage, and deployment on DigitalOcean. To ensure reliability and production readiness, it incorporates a CI/CD pipeline and automated database backup and recovery mechanisms.
 
 # Objectives and Key Features
 - The objective of this project is to develop a secure, scalable, and high-performance cloud-based vehicle trading platform that provides individuals with a faster and safer way to buy and sell vehicles.
