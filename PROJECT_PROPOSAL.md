@@ -97,41 +97,9 @@ The platform improves transparency by allowing sellers to create detailed listin
 
 ### Database Schema Sketch
 1. Users Table
-- user_id (primary key)
-- username
-- email
-- phone_number
-- password_hash
-- role (buyer or seller)
-
 2. Car Listings Table
-- car_id 
-- seller_id (foreign key referencing Users)
-- make
-- model 
-- year
-- price
-- description
-- image_path
-
 3. Buyer Preferences Table
-- preference_id (primary key)
-- buyer_id (foreign key referencing Users)
-- model
-- target_price_low
-- target_price_high
-- year_low
-- year_high
-- created_at
-- updated_at
-- is_active
-
 4. Email Notifications Table
-- notification_id (primary key)
-- buyer_id (foreign key referencing Users)
-- preference_id (foreign key referencing Buyer Preferences)
-- car_ids (array of car_id that triggered the notification)
-- matched_at
 
 # Tentative Plan
 
@@ -182,3 +150,19 @@ Setting up automated email notifications based on user preferences requires inte
 - For team responsibilities, the team will divide the work by system layer, breaking down the work and track them weekly to deliver on time. This setup helped us avoid overlap, work more efficiently.
 
 # AI Assistance Disclosure
+
+## Proposal Without AI
+- The overall concept and motivation of developing a cloud-based auto-trading platform was inspired by the inconvenience and limitations of the existing platforms. 
+- The high-level service architecture includes the separation of frontend (React), backend (Node.js and Express), middleware components and storage types.
+- The selection of deployment tools such as DigitalOcean, Kubernetes for orchestration and DigitalOcean Volumes for persistent storage was independently decided based on the team’s understanding of scalable cloud-native system design
+
+## AI Influced Elements
+- Refined and structured the detailed technical features, breaking high-level ideas into clearly defined seller and buyer functionality
+- Helped organize and clarify what information should be stored in the database.
+- Supported drafting in a feasible week-by-week implementation plan, translating the overall concept into a realistic development roadmap within the project timeline
+
+## AI Influenced Input
+- We consulted with AI the implementation plan of email notification system, including database schema design for buyer preferences and system architecture for the background task that checks for new listings and triggers email notifications.
+- The AI suggested that the team can implement a separate service for handling  email notifications on a scheduled basis, which can check for new listings and match them against buyer preferences stored in the database. 
+- The AI suggested that this service can then use a third-party email service provider (like SendGrid) to send out notifications to buyers when a new listing matches their criteria.
+- We considered the AI's suggestions and decided to implement the email notification system as a separate service as this allows us to keep the email notification logic separate from the main application, and plan for this feature after we have the core listing and search features implemented.
