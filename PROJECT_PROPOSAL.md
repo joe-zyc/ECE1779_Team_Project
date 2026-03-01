@@ -135,6 +135,27 @@ The platform improves transparency by allowing sellers to create detailed listin
 
 # Tentative Plan
 
+## Plan Overview
+- The team will work on the project with weekly sprints and regular check-ins to ensure progress and address any challenges.
+- The development will be divided into four main phases: 
+    - architecture and database design
+    - backend development
+    - frontend development
+    - deployment/monitoring setup
+- Each phase will have specific tasks assigned to team members based on their expertise and interests.
+
+## Weekly Development Plan
+- Week 1: Finailize application architecture, design database schema, and implement basic vehicle listing APIs and public GET APIs for browsing listings.
+- Week 2: Implement user authentication and authorization, including signup/login/logout and RBAC for API endpoints. Implement filtering logic for buyer search and corresponding api endpoints.
+- Week 3: Implement buyer preferences and email notification system, including database schema for preferences, background task for checking new listings, and integration with email service provider.I,mplement frontend interfaces for both buyers and sellers.
+- Week 4: Deploy the application on DigitalOcean using Kubernetes, set up monitoring for the deployed application, and perform final testing and bug fixes.
+
+## Team Member Responsibilities
+- Tianchi Chen: 
+- Noubar Nakhnikian:
+- Yujie Qin:
+- Yuechen Zhang:
+
 # Initial Independent Reasoning (Before Using AI)
 
 ## Architecture Choices
@@ -155,6 +176,9 @@ Implementing secure authentication, role-based access control (RBAC), and sessio
 ### Email Notification System:
 Setting up automated email notifications based on user preferences requires integrating with a third-party service (like SendGrid), scheduling background tasks, and ensuring reliable delivery. We expect to face challenges with setting this up aswell as integrating it, as none of us have experience with this software.
 
-
+## Early Development Approach
+- Our team decided to build the project by setting up the architecture first and then implementing features step by step. 
+- After project architecture is setted up, we focused on implementing the core features, such as the database schema, vehicle listings, and basic filtering APIs. The authentication and authorization will be added after. 
+- For team responsibilities, the team will divide the work by system layer, breaking down the work and track them weekly to deliver on time. This setup helped us avoid overlap, work more efficiently.
 
 # AI Assistance Disclosure
