@@ -9,10 +9,10 @@ The current used car market is highly fragmented and often inefficient for indiv
 Car owners lack a centralized system to store vehicle profiles (make, model, year, VIN), track mileage and expenses, and maintain organized records for resale. Buyers also face limited filtering flexibility when searching for vehicles by brand, year, type, mileage, price, or color. These gaps reduce transparency, trust, and decision-making efficiency. This project proposes a cloud-native car management and trading platform that integrates structured vehicle lifecycle tracking with a searchable used-car marketplace.
 
 ## Target Users
-The target users are adults who are either seeking to purchase a used vehicle or looking to sell their current one. 
+Target users are adults seeking to buy or sell used vehicles.
 
 ## Solution Overview
-The platform improves transparency by allowing sellers to create detailed listings with photos and structured vehicle data, while enabling buyers to filter vehicles across multiple dimensions. It also supports long-term vehicle management beyond a single transaction. The system is built using a stateful cloud-native architecture with containerized services (Docker with Kubernetes), PostgreSQL for persistent structured data, attached cloud volumes for image storage, and deployment on DigitalOcean. To ensure reliability and production readiness.
+The platform improves transparency by allowing sellers to create detailed listings with photos and structured vehicle data, while enabling buyers to filter vehicles across multiple dimensions. It also supports long-term vehicle management beyond a single transaction. The system uses a stateful cloud-native architecture with containerized services (Docker with Kubernetes), PostgreSQL for persistent structured data, cloud volumes for image storage, and deployment on DigitalOcean for reliability.
 
 # Objectives and Key Features
 
@@ -28,7 +28,7 @@ The platform improves transparency by allowing sellers to create detailed listin
 ## Project Scope
 - The project scope is to build a used-car listing platform, with user authentication and email notifications.
 - This project will be built using Node.js and Express for the backend, React for the frontend, and PostgreSQL for the database.
-- The application will be deployed on DigitalOcean using Kubernetes for orchestration, and DigitalOcean Volumes for persistent storage.
+- The application will be deployed on DigitalOcean using Kubernetes and DigitalOcean Volumes for persistent storage.
 
 ## Project Feasibility
 - The project scope is realistic for a team of 4 members within the given timeline. The techinical requirements are well-defined and align with the course project requirements to use Kubernetes, DigitalOcean, and persistent storage with monitoring setup. 
@@ -61,7 +61,7 @@ The platform improves transparency by allowing sellers to create detailed listin
 
 #### Deployment provider
 - Use DigitalOcean Droplet VMs to host the application.
-- Attach DigitalOcean Volumes to store persistent data such as postgrees data and user-uploaded images.
+- Attach DigitalOcean Volumes to store persistent data such as PostgreSQL data and user-uploaded images.
 - This aligns with the requirement to use cloud provider for deploying the application.
 
 #### Orchestration with Kubernetes
@@ -144,13 +144,13 @@ The platform improves transparency by allowing sellers to create detailed listin
 
 ## Architecture Choices
 ### Provider
-Our initial decision is to use DigitalOcean as our cloud provider because it offers a straightforward and easy to use interface. Additionally DigitalOcean was an easy choice because we experience using the service from lectures and assignments.
+Our initial decision is to use DigitalOcean as our cloud provider because it offers a straightforward interface. DigitalOcean was also an easy choice because we have experience using the service from lectures and assignments.
 
 ### Orchestration
 We decided on Kubernetes for orchestrating our application components. Our reasoning was that Kubernetes is widely used in industry and supports automatic scaling and self-healing. Kubernetes also makes it easier to manage multiple services (frontend, backend, database) and to ensure reliable communication between them.
 
 ### Persistent Storage
-We selected DigitalOcean Volumes for persistent storage. This allows us to keep our PostgreSQL database and user-uploaded images safe, even if our application was restarted or rescheduled. Using cloud-based persistent volumes also means we didn’t have to worry about losing stateful data, which is crucial for a marketplace type platform.
+We selected DigitalOcean Volumes for persistent storage. This allows us to keep our PostgreSQL database and user-uploaded images safe, even if our application is restarted or rescheduled. Using cloud-based persistent volumes reduces risk of losing stateful data, which is crucial for a marketplace platform.
 
 ## Anticipated Challenges
 
@@ -170,7 +170,7 @@ Setting up automated email notifications based on user preferences requires inte
 ## Proposal Without AI
 - The overall concept and motivation of developing a cloud-based auto-trading platform was inspired by the inconvenience and limitations of the existing platforms. 
 - The high-level service architecture includes the separation of frontend (React), backend (Node.js and Express), middleware components and storage types.
-- The selection of deployment tools such as DigitalOcean, Kubernetes for orchestration and DigitalOcean Volumes for persistent storage was independently decided based on the team’s understanding of scalable cloud-native system design
+- The selection of deployment tools such as DigitalOcean, Kubernetes for orchestration and DigitalOcean Volumes for persistent storage was independently decided based on the team’s understanding of cloud-native system design.
 
 ## AI Influced Elements
 - Refined and structured the detailed technical features, breaking high-level ideas into clearly defined seller and buyer functionality
