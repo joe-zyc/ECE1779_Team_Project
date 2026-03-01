@@ -2,8 +2,21 @@ ECE1779 - Winter 2026
 Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 
 # Motivation
+## Problem Statement
+The current used car market is highly fragmented and often inefficient for individual buyers and sellers. Many existing car trading platforms are saturated with private dealers, excessive advertisements, potential scams, and high service fees. Most systems focus only on transactions and do not support structures, long-term vehicle record management.
+
+## Project Value
+Car owners lack a centralized system to store vehicle profiles (make, model, year, VIN), track mileage and expenses, and maintain organized records for resale. Buyers also face limited filtering flexibility when searching for vehicles by brand, year, type, mileage, price, or color. These gaps reduce transparency, trust, and decision-making efficiency. This project proposes a cloud-native car management and trading platform that integrates structured vehicle lifecycle tracking with a searchable used-car marketplace.
+
+## Target Users
+Target users are adults seeking to buy or sell used vehicles.
+
+## Solution Overview
+The platform improves transparency by allowing sellers to create detailed listings with photos and structured vehicle data, while enabling buyers to filter vehicles across multiple dimensions. It also supports long-term vehicle management beyond a single transaction. The system uses a stateful cloud-native architecture with containerized services (Docker with Kubernetes), PostgreSQL for persistent structured data, cloud volumes for image storage, and deployment on DigitalOcean for reliability.
 
 # Objectives and Key Features
+
+## Project Objectives
 - The objective of this project is to develop a secure, scalable, and high-performance cloud-based vehicle trading platform that provides individuals with a faster and safer way to buy and sell vehicles.
 - The platform will incorporate a customizable search and preference-matching system to enhance discovery efficiency and user experience. 
 - It will support structured listing lifecycle management with controlled status transitions (draft, published, flagged, removed), enforce strong data validation rules and implement role-based access control to ensure proper ownership. 
@@ -12,12 +25,10 @@ Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 - There will be two advanced features implemented: user authentication and authorization to provide secure access control, and email notifications for buyers to alert them of new listings matching their preferences.
 - Overall, the project aims to build a cloud-native marketplace solution that emphasizes security, scalability, data integrity and user-centered design.
 
-## Project Objectives
-
 ## Project Scope
 - The project scope is to build a used-car listing platform, with user authentication and email notifications.
 - This project will be built using Node.js and Express for the backend, React for the frontend, and PostgreSQL for the database.
-- The application will be deployed on DigitalOcean using Kubernetes for orchestration, and DigitalOcean Volumes for persistent storage.
+- The application will be deployed on DigitalOcean using Kubernetes and DigitalOcean Volumes for persistent storage.
 
 ## Project Feasibility
 - The project scope is realistic for a team of 4 members within the given timeline. The techinical requirements are well-defined and align with the course project requirements to use Kubernetes, DigitalOcean, and persistent storage with monitoring setup. 
@@ -50,11 +61,13 @@ Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 
 #### Deployment provider
 - Use DigitalOcean Droplet VMs to host the application.
-- Attach DigitalOcean Volumes to store persistent data such as postgrees data and user-uploaded images.
+- Attach DigitalOcean Volumes to store persistent data such as PostgreSQL data and user-uploaded images.
+- This aligns with the requirement to use cloud provider for deploying the application.
 
 #### Orchestration with Kubernetes
 - Use Kubernetes to orchestrate the application components, including the frontend, backend, database, and background worker for email notifications.
 - Use Kubernetes services to manage communication between components and ensure scalability and reliability.
+- This aligns with the requirement to use Kubernetes/Docker Swarm for orchestration.
 
 #### Backend Service with Node.js and Express
 - Implement the backend API using Node.js and Express framework.
@@ -65,9 +78,11 @@ Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 #### Persistent Storage with DigitalOcean Volumes 
 - Use DigitalOcean Volumes to store PostgreSQL data.
 - Use DigitalOcean Volumes to store user-uploaded images for car listings.
+- This aligns with the requirement to use database and persistent storage for stateful data.
 
 #### Monitoring Setup
 - Monitor DigitalOcean Droplets and Kubernetes cluster using DigitalOcean monitoring tools to track cpu usage and application health.
+- This aligns with the requirement to set up monitoring for the deployed application.
 
 #### Technical Feature for Advanced Feature 1:
 - Implement user registration and login functionality using JWT for secure authentication.
@@ -80,46 +95,90 @@ Team 26 - Tianchi Chen, Noubar Nakhnikian, Yujie Qin, Yuechen Zhang
 - Implement a background scheduled task to check for new listings and trigger email notifications when criteria are met.
 - Use a third-party email service provider (e.g., *SendGrid*) to handle email sending and ensure reliable delivery.
 
-### Database Schema
+### Database Schema Sketch
 1. Users Table
-- user_id (primary key)
-- username
-- email
-- phone_number
-- password_hash
-- role (buyer or seller)
-
 2. Car Listings Table
-- car_id 
-- seller_id (foreign key referencing Users)
-- make
-- model 
-- year
-- price
-- description
-- image_path
-
 3. Buyer Preferences Table
-- preference_id (primary key)
-- buyer_id (foreign key referencing Users)
-- model
-- target_price_low
-- target_price_high
-- year_low
-- year_high
-- created_at
-- updated_at
-- is_active
-
 4. Email Notifications Table
-- notification_id (primary key)
-- buyer_id (foreign key referencing Users)
-- preference_id (foreign key referencing Buyer Preferences)
-- car_ids (array of car_id that triggered the notification)
-- matched_at
 
 # Tentative Plan
 
+## Plan Overview
+- The team will work on the project with weekly sprints and regular check-ins to ensure progress and address any challenges.
+- The development will be divided into four main phases: 
+    - architecture and database design
+    - backend development
+    - frontend development
+    - deployment/monitoring setup
+- Each phase will have specific tasks assigned to team members based on their expertise and interests.
+
+## Weekly Development Plan
+- Week 1: Finailize application architecture, design database schema, and implement basic vehicle listing APIs, public GET APIs for browsing listings and APIs for user-uploaded images.
+- Week 2: Implement user authentication and authorization, including signup/login/logout and RBAC for API endpoints. Implement filtering logic for buyer search and corresponding api endpoints. Implement frontend interfaces for both buyers and sellers.
+- Week 3: Implement buyer preferences and email notification system, including database schema and API for preferences, background integration with email service provider. Setup testing modules for application debugging.
+- Week 4: Deploy the application on DigitalOcean using Kubernetes, set up monitoring for the deployed application, and perform final testing and bug fixes.
+
+## Team Member Responsibilities
+- Tianchi Chen: 
+    - Buyer API endpoint
+    - Filtering API for Buyer listing
+    - Email Preference API
+- Noubar Nakhnikian: 
+    - Seller API endpoint
+    - Frontend Interface
+    - Testing data and testing modules
+- Yujie Qin: 
+    - Seller API endpoint
+    - Frontend Interface
+    - Email notification Database Schema
+- Yuechen Zhang: 
+    - Application Architecture and Databse Schema Design
+    - Authentication, RBAC desgin and Routing
+    - Email Service Backend Implementation
+- Team Effort
+    - Application Integration and Deployment
+    - Debugging
+    - Monitoring
+
 # Initial Independent Reasoning (Before Using AI)
 
+## Architecture Choices
+### Provider
+Our initial decision is to use DigitalOcean as our cloud provider because it offers a straightforward interface. DigitalOcean was also an easy choice because we have experience using the service from lectures and assignments.
+
+### Orchestration
+We decided on Kubernetes for orchestrating our application components. Our reasoning was that Kubernetes is widely used in industry and supports automatic scaling and self-healing. Kubernetes also makes it easier to manage multiple services (frontend, backend, database) and to ensure reliable communication between them.
+
+### Persistent Storage
+We selected DigitalOcean Volumes for persistent storage. This allows us to keep our PostgreSQL database and user-uploaded images safe, even if our application is restarted or rescheduled. Using cloud-based persistent volumes reduces risk of losing stateful data, which is crucial for a marketplace platform.
+
+## Anticipated Challenges
+
+### User Authentication and Authorization:
+Implementing secure authentication, role-based access control (RBAC), and session management is new territory for most of our team. We anticipated difficulties in properly hashing passwords, securely storing credentials, and restricting API access to certain endpoints. 
+
+### Email Notification System:
+Setting up automated email notifications based on user preferences requires integrating with a third-party service (like SendGrid), scheduling background tasks, and ensuring reliable delivery. We expect to face challenges with setting this up aswell as integrating it, as none of us have experience with this software.
+
+## Early Development Approach
+- Our team decided to build the project by setting up the architecture first and then implementing features step by step. 
+- After project architecture is setted up, we focused on implementing the core features, such as the database schema, vehicle listings, and basic filtering APIs. The authentication and authorization will be added after. 
+- For team responsibilities, the team will divide the work by system layer, breaking down the work and track them weekly to deliver on time. This setup helped us avoid overlap, work more efficiently.
+
 # AI Assistance Disclosure
+
+## Proposal Without AI
+- The overall concept and motivation of developing a cloud-based auto-trading platform was inspired by the inconvenience and limitations of the existing platforms. 
+- The high-level service architecture includes the separation of frontend (React), backend (Node.js and Express), middleware components and storage types.
+- The selection of deployment tools such as DigitalOcean, Kubernetes for orchestration and DigitalOcean Volumes for persistent storage was independently decided based on the team’s understanding of cloud-native system design.
+
+## AI Influced Elements
+- Refined and structured the detailed technical features, breaking high-level ideas into clearly defined seller and buyer functionality
+- Helped organize and clarify what information should be stored in the database.
+- Supported drafting in a feasible week-by-week implementation plan, translating the overall concept into a realistic development roadmap within the project timeline
+
+## AI Influenced Input
+- We consulted with AI the implementation plan of email notification system, including database schema design for buyer preferences and system architecture for the background task that checks for new listings and triggers email notifications.
+- The AI suggested that the team can implement a separate service for handling  email notifications on a scheduled basis, which can check for new listings and match them against buyer preferences stored in the database. 
+- The AI suggested that this service can then use a third-party email service provider (like SendGrid) to send out notifications to buyers when a new listing matches their criteria.
+- We considered the AI's suggestions and decided to implement the email notification system as a separate service as this allows us to keep the email notification logic separate from the main application, and plan for this feature after we have the core listing and search features implemented.
