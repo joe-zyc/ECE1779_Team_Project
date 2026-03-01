@@ -113,16 +113,32 @@ The platform improves transparency by allowing sellers to create detailed listin
 - Each phase will have specific tasks assigned to team members based on their expertise and interests.
 
 ## Weekly Development Plan
-- Week 1: Finailize application architecture, design database schema, and implement basic vehicle listing APIs and public GET APIs for browsing listings.
-- Week 2: Implement user authentication and authorization, including signup/login/logout and RBAC for API endpoints. Implement filtering logic for buyer search and corresponding api endpoints.
-- Week 3: Implement buyer preferences and email notification system, including database schema for preferences, background task for checking new listings, and integration with email service provider.I,mplement frontend interfaces for both buyers and sellers.
+- Week 1: Finailize application architecture, design database schema, and implement basic vehicle listing APIs, public GET APIs for browsing listings and APIs for user-uploaded images.
+- Week 2: Implement user authentication and authorization, including signup/login/logout and RBAC for API endpoints. Implement filtering logic for buyer search and corresponding api endpoints. Implement frontend interfaces for both buyers and sellers.
+- Week 3: Implement buyer preferences and email notification system, including database schema and API for preferences, background integration with email service provider. Setup testing modules for application debugging.
 - Week 4: Deploy the application on DigitalOcean using Kubernetes, set up monitoring for the deployed application, and perform final testing and bug fixes.
 
 ## Team Member Responsibilities
 - Tianchi Chen: 
-- Noubar Nakhnikian:
-- Yujie Qin:
-- Yuechen Zhang:
+    - Buyer API endpoint
+    - Filtering API for Buyer listing
+    - Email Preference API
+- Noubar Nakhnikian: 
+    - Seller API endpoint
+    - Frontend Interface
+    - Testing data and testing modules
+- Yujie Qin: 
+    - Seller API endpoint
+    - Frontend Interface
+    - Email notification Database Schema
+- Yuechen Zhang: 
+    - Application Architecture and Databse Schema Design
+    - Authentication, RBAC desgin and Routing
+    - Email Service Backend Implementation
+- Team Effort
+    - Application Integration and Deployment
+    - Debugging
+    - Monitoring
 
 # Initial Independent Reasoning (Before Using AI)
 
