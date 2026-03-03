@@ -3,7 +3,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE TYPE user_role AS ENUM ('buyer', 'seller', 'admin');
+CREATE TYPE user_role AS ENUM ('buyer', 'seller');
 CREATE TYPE listing_status AS ENUM ('draft', 'published', 'removed');
 
 \ir users.sql
