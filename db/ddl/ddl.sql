@@ -1,5 +1,3 @@
--- Run with: psql -d <db_name> -f ECE1779_Team_Project/db/ddl/99_apply_all.sql
-
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
