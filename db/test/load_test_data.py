@@ -21,10 +21,10 @@ DEFAULT_TABLE_LOAD_ORDER = [
     ("users", "users.csv"),
     ("car_listings", "car_listings.csv"),
     ("buyer_preferences", "buyer_preferences.csv"),
-    ("listing_images", "listing_images.csv"),
+    ("car_listing_images", "listing_images.csv"),
 ]
 
-DEFAULT_TRUNCATE_ORDER = ["listing_images", "buyer_preferences", "car_listings", "users"]
+DEFAULT_TRUNCATE_ORDER = ["car_listing_images", "buyer_preferences", "car_listings", "users"]
 
 
 def parse_args() -> argparse.Namespace:
