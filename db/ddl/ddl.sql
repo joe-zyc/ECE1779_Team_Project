@@ -2,9 +2,9 @@ BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TYPE IF NOT EXISTS user_role AS ENUM ('buyer', 'seller');
+CREATE TYPE user_role AS ENUM ('buyer', 'seller');
 
-CREATE TYPE IF NOT EXISTS listing_status AS ENUM ('draft', 'published', 'removed');
+CREATE TYPE listing_status AS ENUM ('draft', 'published', 'removed');
 
 CREATE TABLE IF NOT EXISTS users (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),

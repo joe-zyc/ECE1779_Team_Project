@@ -140,14 +140,44 @@ def resolve_table_load_order(config: dict) -> list[tuple[str, str]]:
 
 
 def resolve_truncate_order(config: dict, table_load_order: Sequence[tuple[str, str]]) -> list[str]:
+    valid_tables = [table for table, _ in table_load_order]
+    table_aliases: dict[str, str] = {}
+    for table, csv_file in table_load_order:
+        table_aliases[table] = table
+        csv_stem = Path(csv_file).stem
+        # Allow truncate_order to reference CSV base names (e.g., listing_images).
+        if csv_stem and csv_stem not in table_aliases:
+            table_aliases[csv_stem] = table
+
     raw_order = config.get("truncate_order")
     if raw_order is None:
-        fallback_order = [table for table, _ in table_load_order]
+        fallback_order = list(valid_tables)
         fallback_order.reverse()
         return fallback_order or list(DEFAULT_TRUNCATE_ORDER)
+
     if not isinstance(raw_order, list) or not all(isinstance(x, str) for x in raw_order):
         raise ValueError("`truncate_order` in config must be a list of table names.")
-    return list(raw_order)
+
+    resolved: list[str] = []
+    unknown: list[str] = []
+    for table_name in raw_order:
+        normalized = table_name.strip()
+        mapped = table_aliases.get(normalized)
+        if mapped:
+            resolved.append(mapped)
+        else:
+            unknown.append(table_name)
+
+    if unknown:
+        valid_values = ", ".join(sorted(table_aliases))
+        raise ValueError(
+            "`truncate_order` has unknown table(s): "
+            f"{', '.join(unknown)}. Valid table/alias values: {valid_values}"
+        )
+
+    if not resolved:
+        raise ValueError("`truncate_order` must not be empty.")
+    return resolved
 
 
 def build_conn_str(args: argparse.Namespace, config: dict) -> str:

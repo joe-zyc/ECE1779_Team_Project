@@ -24,7 +24,7 @@ tables:
     csv: listing_images.csv
 
 truncate_order:
-  - listing_images
+  - car_listing_images
   - buyer_preferences
   - car_listings
   - users
