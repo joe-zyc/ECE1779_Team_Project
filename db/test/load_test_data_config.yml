@@ -1,0 +1,30 @@
+data_dir: .
+
+database:
+  # Option A: full URL (preferred). Leave empty to use host/port/name/user/password below.
+  # url: "postgresql://postgres:postgres@localhost:5432/postgres"
+  url: "postgresql://test_user:test_pass@localhost:5433/test_db"
+  host: "localhost"
+  port: 5432
+  name: "postgres"
+  user: "postgres"
+  password: ""
+
+options:
+  truncate_before_load: false
+
+tables:
+  - table: users
+    csv: users.csv
+  - table: car_listings
+    csv: car_listings.csv
+  - table: buyer_preferences
+    csv: buyer_preferences.csv
+  - table: car_listing_images
+    csv: listing_images.csv
+
+truncate_order:
+  - car_listing_images
+  - buyer_preferences
+  - car_listings
+  - users
