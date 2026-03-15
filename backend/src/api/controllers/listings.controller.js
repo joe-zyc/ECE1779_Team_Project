@@ -1,8 +1,25 @@
 const { Pool } = require("pg");
 
+const { notifyMatchingBuyers } = require("../../services/notification.service");
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+const UPDATABLE_FIELDS = [
+  "make",
+  "model",
+  "trim",
+  "year",
+  "vin",
+  "body_type",
+  "color",
+  "mileage_km",
+  "price",
+  "description",
+  "contact_email",
+  "contact_phone",
+];
 
 /* ---------------------------
    GET /listings
@@ -77,6 +94,12 @@ const createListing = async (req, res, next) => {
       contact_phone,
     } = req.body;
 
+    if (!make || !model || !year || !price) {
+      return res
+        .status(400)
+        .json({ error: "make, model, year, and price are required" });
+    }
+
     const result = await pool.query(
       `INSERT INTO car_listings
       (seller_id, make, model, trim, year, vin, body_type,
@@ -119,10 +142,16 @@ const updateListing = async (req, res, next) => {
     const values = [];
     let index = 1;
 
-    for (const key in req.body) {
-      fields.push(`${key}=$${index}`);
-      values.push(req.body[key]);
-      index++;
+    for (const key of UPDATABLE_FIELDS) {
+      if (key in req.body) {
+        fields.push(`${key}=$${index}`);
+        values.push(req.body[key]);
+        index++;
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: "No valid fields provided for update" });
     }
 
     values.push(id);
@@ -135,6 +164,10 @@ const updateListing = async (req, res, next) => {
        RETURNING *`,
       values
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
 
     res.json({ data: result.rows[0] });
   } catch (err) {
@@ -149,13 +182,18 @@ const deleteListing = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await pool.query(
+    const result = await pool.query(
       `UPDATE car_listings
        SET status='removed',
        removed_at=NOW()
-       WHERE id=$1`,
+       WHERE id=$1
+       RETURNING id`,
       [id]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
 
     res.json({ message: "Listing removed" });
   } catch (err) {
@@ -179,10 +217,13 @@ const publishListing = async (req, res, next) => {
       [id]
     );
 
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
+
     const listing = result.rows[0];
 
-    /* -------- EMAIL NOTIFICATION HOOK -------- */
-    // await notifyMatchingBuyers(listing)
+    await notifyMatchingBuyers(listing);
 
     res.json({ data: listing });
   } catch (err) {
@@ -205,6 +246,10 @@ const unpublishListing = async (req, res, next) => {
        RETURNING *`,
       [id]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
 
     res.json({ data: result.rows[0] });
   } catch (err) {
@@ -242,6 +287,10 @@ const uploadListingImages = async (req, res, next) => {
 
     const files = req.files;
 
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
+
     const images = [];
 
     for (const file of files) {
@@ -263,17 +312,22 @@ const uploadListingImages = async (req, res, next) => {
 };
 
 /* ---------------------------
-   DELETE image
+   DELETE /listings/:id/images/:imageId
 --------------------------- */
 const deleteListingImage = async (req, res, next) => {
   try {
-    const { imageId } = req.params;
+    const { id, imageId } = req.params;
 
-    await pool.query(
+    const result = await pool.query(
       `DELETE FROM car_listing_images
-       WHERE id=$1`,
-      [imageId]
+       WHERE id=$1 AND listing_id=$2
+       RETURNING id`,
+      [imageId, id]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Image not found" });
+    }
 
     res.json({ message: "Image deleted" });
   } catch (err) {
@@ -282,18 +336,24 @@ const deleteListingImage = async (req, res, next) => {
 };
 
 /* ---------------------------
-   REPORT listing
+   POST /listings/:id/report
 --------------------------- */
 const reportListing = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await pool.query(
+    const result = await pool.query(
       `UPDATE car_listings
-       SET status='removed'
-       WHERE id=$1`
-      , [id]
+       SET status='removed',
+       removed_at=NOW()
+       WHERE id=$1
+       RETURNING id`,
+      [id]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
 
     res.json({ message: "Listing reported" });
   } catch (err) {
