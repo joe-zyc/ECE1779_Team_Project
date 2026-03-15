@@ -4,7 +4,11 @@ const buyerService = require("../services/buyer_service");
 // Buyer/Public endpoints
 const listPublicListings = async (req, res) => {
   try {
-    const listings = await buyerService.getPublishedListings();
+
+    const filters = req.query;
+
+    const listings = await buyerService.getPublishedListings(filters);
+    
     return res.status(200).json({ data: listings });
   } catch (error) {
     console.error("listPublicListings error:", error);

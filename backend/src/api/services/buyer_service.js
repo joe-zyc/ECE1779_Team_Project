@@ -1,6 +1,87 @@
 const pool = require("../../config/db");
 
-const getPublishedListings = async () => {
+const getPublishedListings = async (filters = {}) => {
+  const conditions = [`l.status = 'published'`];
+  const values = [];
+  let index = 1;
+
+  // text filters
+  if (filters.make) {
+    conditions.push(`l.make = $${index++}`);
+    values.push(filters.make);
+  }
+
+  if (filters.model) {
+    conditions.push(`l.model = $${index++}`);
+    values.push(filters.model);
+  }
+
+  if (filters.trim) {
+    conditions.push(`l.trim = $${index++}`);
+    values.push(filters.trim);
+  }
+
+  if (filters.bodyType) {
+    conditions.push(`l.body_type = $${index++}`);
+    values.push(filters.bodyType);
+  }
+
+  if (filters.color) {
+    conditions.push(`l.color = $${index++}`);
+    values.push(filters.color);
+  }
+
+  // year range
+  if (filters.yearMin) {
+    conditions.push(`l.year >= $${index++}`);
+    values.push(Number(filters.yearMin));
+  }
+
+  if (filters.yearMax) {
+    conditions.push(`l.year <= $${index++}`);
+    values.push(Number(filters.yearMax));
+  }
+
+  // price range
+  if (filters.priceMin) {
+    conditions.push(`l.price >= $${index++}`);
+    values.push(Number(filters.priceMin));
+  }
+
+  if (filters.priceMax) {
+    conditions.push(`l.price <= $${index++}`);
+    values.push(Number(filters.priceMax));
+  }
+
+  // mileage range
+  if (filters.mileageMin) {
+    conditions.push(`l.mileage_km >= $${index++}`);
+    values.push(Number(filters.mileageMin));
+  }
+
+  if (filters.mileageMax) {
+    conditions.push(`l.mileage_km <= $${index++}`);
+    values.push(Number(filters.mileageMax));
+  }
+
+  const allowedSortFields = [
+    "price",
+    "year",
+    "mileage_km",
+    "created_at",
+    "published_at",
+  ];
+
+  const sort = allowedSortFields.includes(filters.sort)
+    ? filters.sort
+    : "published_at";
+
+  const order = filters.order === "asc" ? "ASC" : "DESC";
+
+  const page = Number(filters.page) > 0 ? Number(filters.page) : 1;
+  const limit = Number(filters.limit) > 0 ? Number(filters.limit) : 10;
+  const offset = (page - 1) * limit;
+
   const query = `
     SELECT
       l.id,
@@ -26,11 +107,13 @@ const getPublishedListings = async () => {
         LIMIT 1
       ) AS "thumbnailUrl"
     FROM car_listings l
-    WHERE l.status = 'published'
-    ORDER BY l.published_at DESC NULLS LAST, l.created_at DESC, l.id DESC;
+    WHERE ${conditions.join(" AND ")}
+    ORDER BY l.${sort} ${order}
+    LIMIT ${limit}
+    OFFSET ${offset};
   `;
 
-  const result = await pool.query(query);
+  const result = await pool.query(query, values);
   return result.rows;
 };
 
