@@ -1,7 +1,33 @@
 const { buildNotImplementedHandler } = require("./_template");
+const buyerService = require("../services/buyer_service");
 
-const listPublicListings = buildNotImplementedHandler("GET /listings");
-const getListingById = buildNotImplementedHandler("GET /listings/:id");
+// Buyer/Public endpoints
+const listPublicListings = async (req, res) => {
+  try {
+    const listings = await buyerService.getPublishedListings();
+    return res.status(200).json({ data: listings });
+  } catch (error) {
+    console.error("listPublicListings error:", error);
+    return res.status(500).json({ message: "Failed to fetch published listings." });
+  }
+};
+
+const getListingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const listing = await buyerService.getPublishedListingById(id);
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found." });
+    }
+
+    return res.status(200).json({ data: listing });
+  } catch (error) {
+    console.error("getListingById error:", error);
+    return res.status(500).json({ message: "Failed to fetch listing detail." });
+  }
+};
+
 const createListing = buildNotImplementedHandler("POST /listings");
 const updateListing = buildNotImplementedHandler("PATCH /listings/:id");
 const deleteListing = buildNotImplementedHandler("DELETE /listings/:id");

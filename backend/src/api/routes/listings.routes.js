@@ -40,5 +40,5 @@ router.delete(
 router.post("/:id/report", authMiddleware, requireRole(USER_ROLES.BUYER), listingsController.reportListing);
 
 module.exports = {
-  listingsRouter: router,
+  listingsRouter: router
 };

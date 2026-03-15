@@ -1,6 +1,5 @@
 const dotenv = require("dotenv");
 const path = require("path");
-const { env } = require("./env");
 
 dotenv.config();
 
@@ -8,7 +7,13 @@ const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 3001),
   apiBasePath: process.env.API_BASE_PATH || "/api/v1",
-  databaseUrl: process.env.DATABASE_URL || "",
+
+  dbHost: process.env.DB_HOST || "localhost",
+  dbPort: Number(process.env.DB_PORT || 5432),
+  dbUser: process.env.DB_USER || "postgres",
+  dbPassword: process.env.DB_PASSWORD || "",
+  dbName: process.env.DB_NAME || "",
+
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || "",
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || "",
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || "15m",

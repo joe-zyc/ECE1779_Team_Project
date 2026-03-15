@@ -1,12 +1,16 @@
 const { Pool } = require("pg");
 const { env } = require("./env");
 
-if (!env.databaseUrl) {
-  throw new Error("DATABASE_URL is not set in environment variables.");
+if (!env.dbName) {
+  throw new Error("Database configuration is missing.");
 }
 
 const pool = new Pool({
-  connectionString: env.databaseUrl,
+  host: env.dbHost,
+  port: env.dbPort,
+  user: env.dbUser,
+  password: env.dbPassword,
+  database: env.dbName,
 });
 
 pool.connect()
