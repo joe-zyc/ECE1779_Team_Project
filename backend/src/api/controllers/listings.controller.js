@@ -1,6 +1,6 @@
 const { Pool } = require("pg");
 
-const { notifyMatchingBuyers } = require("../../services/notification.service");
+//const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
