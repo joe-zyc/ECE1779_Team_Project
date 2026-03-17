@@ -1,4 +1,5 @@
 const multer = require("multer");
+const fs = require("fs");
 const path = require("path");
 
 const { AppError } = require("../../core/http/errors");
@@ -6,6 +7,9 @@ const { env } = require("../../config/env");
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+// Ensure upload directory exists (important on fresh environments/containers)
+fs.mkdirSync(env.uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {

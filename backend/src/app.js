@@ -1,5 +1,6 @@
 const cors = require("cors");
 const express = require("express");
+const path = require("path");
 
 const { env } = require("./config/env");
 const { apiRouter } = require("./api/routes");
@@ -20,6 +21,9 @@ function createApp() {
   app.get("/health/ready", (_req, res) => {
     res.status(200).json({ data: { status: "ok" } });
   });
+
+  // Serve uploaded listing images under /storage/uploads/*
+  app.use("/storage", express.static(path.resolve(process.cwd(), "storage")));
 
   app.use(env.apiBasePath, apiRouter);
   app.use(notFoundMiddleware);

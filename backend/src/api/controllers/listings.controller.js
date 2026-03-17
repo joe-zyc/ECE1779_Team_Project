@@ -1,10 +1,27 @@
 const { Pool } = require("pg");
+const path = require("path");
 
 //const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+function toPublicStoragePath(filePath) {
+  if (!filePath) {
+    return filePath;
+  }
+
+  const normalized = String(filePath).replace(/\\/g, "/");
+  const marker = "/storage/uploads/";
+  const markerIndex = normalized.indexOf(marker);
+
+  if (markerIndex >= 0) {
+    return normalized.slice(markerIndex + 1);
+  }
+
+  return path.relative(process.cwd(), filePath).replace(/\\/g, "/");
+}
 
 const UPDATABLE_FIELDS = [
   "make",
@@ -60,10 +77,15 @@ const getListingById = async (req, res, next) => {
       [id]
     );
 
+    const imagesWithPublicPath = images.rows.map((image) => ({
+      ...image,
+      storage_path: toPublicStoragePath(image.storage_path),
+    }));
+
     res.json({
       data: {
         ...listing.rows[0],
-        images: images.rows,
+        images: imagesWithPublicPath,
       },
     });
   } catch (err) {
@@ -294,12 +316,13 @@ const uploadListingImages = async (req, res, next) => {
     const images = [];
 
     for (const file of files) {
+      const storagePath = toPublicStoragePath(file.path);
       const result = await pool.query(
         `INSERT INTO car_listing_images
          (listing_id, storage_path)
          VALUES ($1,$2)
          RETURNING *`,
-        [id, file.path]
+        [id, storagePath]
       );
 
       images.push(result.rows[0]);
