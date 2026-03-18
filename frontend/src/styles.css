@@ -12,6 +12,7 @@
   --success: #007f6d;
   --warn: #bd8a00;
   --danger: #b42539;
+  --focus: #2f78aa;
   --surface: rgba(255, 255, 255, 0.85);
   --shadow-lg: 0 30px 80px rgba(6, 19, 31, 0.24);
   --shadow-sm: 0 8px 20px rgba(9, 29, 47, 0.12);
@@ -34,6 +35,7 @@ body {
   margin: 0;
   font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
   color: var(--ink);
+  -webkit-tap-highlight-color: rgba(22, 58, 83, 0.16);
   background:
     radial-gradient(circle at 15% 10%, rgba(255, 111, 61, 0.24), transparent 34%),
     radial-gradient(circle at 88% 24%, rgba(92, 193, 226, 0.2), transparent 32%),
@@ -77,6 +79,11 @@ p {
   margin: 0;
 }
 
+h1,
+h2 {
+  text-wrap: balance;
+}
+
 dt,
 dd {
   margin: 0;
@@ -89,8 +96,34 @@ button {
   font: inherit;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus) 55%, white);
+  outline-offset: 2px;
+}
+
 .app-frame {
   min-height: 100vh;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #0f2b43;
+  color: #fff;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  left: 12px;
+  top: 12px;
 }
 
 .topbar {
@@ -251,6 +284,10 @@ button {
   gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   align-items: end;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  border: 1px solid #d3dfea;
+  background: rgba(255, 255, 255, 0.76);
 }
 
 label {
@@ -274,7 +311,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid rgba(255, 111, 61, 0.4);
+  outline: 2px solid rgba(47, 120, 170, 0.35);
   border-color: rgba(255, 111, 61, 0.65);
 }
 
@@ -287,6 +324,7 @@ textarea:focus {
   padding: 11px 14px;
   font-weight: 700;
   cursor: pointer;
+  touch-action: manipulation;
   box-shadow: 0 8px 18px rgba(225, 93, 47, 0.24);
   transition: transform 180ms ease, filter 180ms ease;
 }
@@ -388,6 +426,13 @@ textarea:focus {
   padding: 14px;
   box-shadow: var(--shadow-sm);
   animation: rise-in 300ms ease both;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.listing-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(11, 29, 45, 0.16);
+  border-color: #c7d5e3;
 }
 
 .listing-card-compact {
@@ -446,6 +491,7 @@ textarea:focus {
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.76rem;
   color: #4f687c;
+  font-variant-numeric: tabular-nums;
 }
 
 .listing-card h3 {
@@ -459,6 +505,7 @@ textarea:focus {
   font-size: 1.28rem;
   font-weight: 700;
   color: #103552;
+  font-variant-numeric: tabular-nums;
 }
 
 .listing-meta,
@@ -486,9 +533,21 @@ textarea:focus {
   color: #173750;
 }
 
+.detail-grid-specs {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
+.detail-grid-contact {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
 .listing-description {
   margin-top: 10px;
   color: #31475a;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .row-actions {
@@ -628,6 +687,11 @@ textarea:focus {
 
   .form-span-2 {
     grid-column: span 1;
+  }
+
+  .detail-grid-specs,
+  .detail-grid-contact {
+    grid-template-columns: 1fr;
   }
 }
 

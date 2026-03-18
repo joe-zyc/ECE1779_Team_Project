@@ -234,19 +234,19 @@ export default function SellerDashboardPage() {
         </div>
 
         <button className="button" disabled={busy} type="submit">
-          {busy ? "Saving..." : "Create Draft"}
+          {busy ? "Saving…" : "Create Draft"}
         </button>
       </form>
 
       <article className="stack-md">
         <div className="section-head">
           <h2>My Listings</h2>
-          <button className="button button-subtle" onClick={loadMyListings}>
+          <button className="button button-subtle" type="button" onClick={loadMyListings}>
             Reload
           </button>
         </div>
 
-        {loading && <p className="muted">Loading your listings...</p>}
+        {loading && <p className="muted">Loading Your Listings…</p>}
         {!loading && listings.length === 0 && (
           <Notice kind="info">No listings yet. Create your first draft above.</Notice>
         )}
@@ -280,12 +280,17 @@ export default function SellerDashboardPage() {
 
                 <div className="panel stack-sm">
                   <div className="row-actions">
-                    <button className="button button-subtle" onClick={() => startEditing(listing)}>
+                    <button className="button button-subtle" type="button" onClick={() => startEditing(listing)}>
                       Edit Fields
                     </button>
 
                     {isEditing && (
-                      <button className="button" onClick={() => saveEdit(listing.id)} disabled={busy}>
+                      <button
+                        className="button"
+                        type="button"
+                        onClick={() => saveEdit(listing.id)}
+                        disabled={busy}
+                      >
                         Save Edit
                       </button>
                     )}
@@ -346,6 +351,7 @@ export default function SellerDashboardPage() {
 
                   <button
                     className="button button-subtle"
+                    type="button"
                     disabled={!uploadFiles[listing.id] || uploadFiles[listing.id].length === 0 || busy}
                     onClick={() => uploadImages(listing.id)}
                   >

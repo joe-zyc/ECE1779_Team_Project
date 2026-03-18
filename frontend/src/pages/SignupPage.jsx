@@ -60,8 +60,10 @@ export default function SignupPage() {
         <label>
           Display Name
           <input
+            name="display_name"
             type="text"
             required
+            autoComplete="name"
             value={form.display_name}
             onChange={(event) =>
               setForm((current) => ({
@@ -75,8 +77,11 @@ export default function SignupPage() {
         <label>
           Email
           <input
+            name="email"
             type="email"
             required
+            autoComplete="email"
+            spellCheck={false}
             value={form.email}
             onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
           />
@@ -85,9 +90,11 @@ export default function SignupPage() {
         <label>
           Password
           <input
+            name="password"
             type="password"
             required
             minLength="6"
+            autoComplete="new-password"
             value={form.password}
             onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
           />
@@ -96,6 +103,7 @@ export default function SignupPage() {
         <label>
           Role
           <select
+            name="role"
             value={form.role}
             onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}
           >
@@ -107,14 +115,18 @@ export default function SignupPage() {
         <label>
           Phone (optional)
           <input
+            name="phone"
             type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="e.g., 416-555-0100…"
             value={form.phone}
             onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
           />
         </label>
 
         <button className="button" type="submit" disabled={busy}>
-          {busy ? "Creating account..." : "Create Account"}
+          {busy ? "Creating Account…" : "Create Account"}
         </button>
 
         <p className="muted">

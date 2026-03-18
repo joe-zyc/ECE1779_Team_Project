@@ -12,11 +12,15 @@ export default function AppShell({ children }) {
 
   async function onLogout() {
     await logout();
-    navigate("/");
+    navigate("/browse");
   }
 
   return (
     <div className="app-frame">
+      <a href="#main-content" className="skip-link">
+        Skip to Main Content
+      </a>
+
       <header className="topbar">
         <div className="brand-wrap">
           <span className="brand-dot" />
@@ -61,7 +65,7 @@ export default function AppShell({ children }) {
               <NavLink to="/me" className={navClassName}>
                 Profile
               </NavLink>
-              <button className="ghost-button" onClick={onLogout}>
+              <button className="ghost-button" type="button" onClick={onLogout}>
                 Log Out
               </button>
             </>
@@ -69,7 +73,7 @@ export default function AppShell({ children }) {
         </nav>
       </header>
 
-      <main className="page-shell">
+      <main className="page-shell" id="main-content">
         {isAuthenticated && (
           <aside className="session-pill">
             <p className="session-name">{user?.display_name || "Signed-in user"}</p>

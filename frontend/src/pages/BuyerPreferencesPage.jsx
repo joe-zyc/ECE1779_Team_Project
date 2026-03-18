@@ -262,19 +262,19 @@ export default function BuyerPreferencesPage() {
         </div>
 
         <button className="button" type="submit" disabled={busy}>
-          {busy ? "Saving..." : "Save Preference"}
+          {busy ? "Saving…" : "Save Preference"}
         </button>
       </form>
 
       <article className="panel stack-md">
         <div className="section-head">
           <h2>My Preferences</h2>
-          <button className="button button-subtle" onClick={loadPreferences}>
+          <button className="button button-subtle" type="button" onClick={loadPreferences}>
             Reload
           </button>
         </div>
 
-        {loading && <p className="muted">Loading preferences...</p>}
+        {loading && <p className="muted">Loading Preferences…</p>}
         {!loading && preferences.length === 0 && !notImplemented && (
           <Notice kind="info">No preferences saved yet.</Notice>
         )}
@@ -295,10 +295,14 @@ export default function BuyerPreferencesPage() {
                 </p>
 
                 <div className="row-actions">
-                  <button className="button button-subtle" onClick={() => startEdit(preference)}>
+                  <button className="button button-subtle" type="button" onClick={() => startEdit(preference)}>
                     Edit
                   </button>
-                  <button className="button button-danger" onClick={() => deletePreference(preference.id)}>
+                  <button
+                    className="button button-danger"
+                    type="button"
+                    onClick={() => deletePreference(preference.id)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -398,7 +402,12 @@ export default function BuyerPreferencesPage() {
                 )}
 
                 {isEditing && (
-                  <button className="button" onClick={() => saveEdit(preference.id)} disabled={busy}>
+                  <button
+                    className="button"
+                    type="button"
+                    onClick={() => saveEdit(preference.id)}
+                    disabled={busy}
+                  >
                     Save Changes
                   </button>
                 )}

@@ -115,38 +115,41 @@ export default function PublicListingsPage() {
         <label>
           Search
           <input
+            name="search"
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="make, model, trim, color"
+            placeholder="make, model, trim, color…"
           />
         </label>
 
         <label>
           Min Price (CAD)
           <input
+            name="min_price"
             type="number"
             min="0"
             value={minPrice}
             onChange={(event) => setMinPrice(event.target.value)}
-            placeholder="optional"
+            placeholder="Optional…"
           />
         </label>
 
         <label>
           Max Price (CAD)
           <input
+            name="max_price"
             type="number"
             min="0"
             value={maxPrice}
             onChange={(event) => setMaxPrice(event.target.value)}
-            placeholder="optional"
+            placeholder="Optional…"
           />
         </label>
 
         <label>
           Sort
-          <select value={sortKey} onChange={(event) => setSortKey(event.target.value)}>
+          <select name="sort" value={sortKey} onChange={(event) => setSortKey(event.target.value)}>
             <option value="newest">Newest</option>
             <option value="priceAsc">Price: Low to High</option>
             <option value="priceDesc">Price: High to Low</option>
@@ -155,14 +158,14 @@ export default function PublicListingsPage() {
           </select>
         </label>
 
-        <button className="button" onClick={loadListings}>
+        <button className="button" type="button" onClick={loadListings}>
           Refresh
         </button>
       </div>
 
       {error && <Notice kind="error">{error}</Notice>}
 
-      {loading && <p className="muted">Loading listings...</p>}
+      {loading && <p className="muted">Loading Listings…</p>}
 
       {!loading && filteredListings.length === 0 && (
         <Notice kind="info">No listings match your current filters.</Notice>
@@ -178,6 +181,7 @@ export default function PublicListingsPage() {
         <div className="pagination-bar">
           <button
             className="button button-subtle"
+            type="button"
             disabled={currentPage <= 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
           >
@@ -188,6 +192,7 @@ export default function PublicListingsPage() {
           </p>
           <button
             className="button button-subtle"
+            type="button"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
           >

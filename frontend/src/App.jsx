@@ -16,7 +16,7 @@ function ProtectedRoute({ roles, children }) {
   const { ready, isAuthenticated, role } = useAuth();
 
   if (!ready) {
-    return <p className="muted">Checking session...</p>;
+    return <p className="muted">Checking Session…</p>;
   }
 
   if (!isAuthenticated) {
@@ -39,7 +39,7 @@ function ListingDetailRoute() {
   const { ready, isAuthenticated } = useAuth();
 
   if (!ready) {
-    return <p className="muted">Checking session...</p>;
+    return <p className="muted">Checking Session…</p>;
   }
 
   if (!isAuthenticated) {

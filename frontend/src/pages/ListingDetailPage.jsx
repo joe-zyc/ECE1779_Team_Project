@@ -4,6 +4,10 @@ import { Link, useParams } from "react-router-dom";
 import Notice from "../components/Notice";
 import { listingsApi } from "../api/client";
 
+const API_ORIGIN = import.meta.env.VITE_API_BASE_URL
+  ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "")
+  : "http://localhost:3001";
+
 function toCurrency(value) {
   if (value === null || value === undefined || value === "") {
     return "N/A";
@@ -30,11 +34,11 @@ function imageHref(storagePath) {
   const markerIndex = normalized.indexOf(marker);
 
   if (markerIndex >= 0) {
-    return `http://localhost:3001${normalized.slice(markerIndex)}`;
+    return `${API_ORIGIN}${normalized.slice(markerIndex)}`;
   }
 
   const trimmed = normalized.replace(/^\.?\/?/, "");
-  return `http://localhost:3001/${trimmed}`;
+  return `${API_ORIGIN}/${trimmed}`;
 }
 
 export default function ListingDetailPage() {
@@ -69,7 +73,7 @@ export default function ListingDetailPage() {
         Back to listings
       </Link>
 
-      {loading && <p className="muted">Loading listing details...</p>}
+      {loading && <p className="muted">Loading Listing Details…</p>}
       {error && <Notice kind="error">{error}</Notice>}
 
       {!loading && listing && (
@@ -85,36 +89,45 @@ export default function ListingDetailPage() {
             </div>
           </div>
 
-          <dl className="detail-grid">
-            <div>
-              <dt>Status</dt>
-              <dd>{listing.status || "published"}</dd>
-            </div>
-            <div>
-              <dt>Mileage</dt>
-              <dd>{listing.mileage_km ? `${listing.mileage_km} km` : "N/A"}</dd>
-            </div>
-            <div>
-              <dt>Body Type</dt>
-              <dd>{listing.body_type || "N/A"}</dd>
-            </div>
-            <div>
-              <dt>Color</dt>
-              <dd>{listing.color || "N/A"}</dd>
-            </div>
-            <div>
-              <dt>VIN</dt>
-              <dd>{listing.vin || "N/A"}</dd>
-            </div>
-            <div>
-              <dt>Contact Email</dt>
-              <dd>{listing.contact_email || "N/A"}</dd>
-            </div>
-            <div>
-              <dt>Contact Phone</dt>
-              <dd>{listing.contact_phone || "N/A"}</dd>
-            </div>
-          </dl>
+          <div className="stack-sm">
+            <h2>Vehicle Details</h2>
+            <dl className="detail-grid detail-grid-specs">
+              <div>
+                <dt>Status</dt>
+                <dd>{listing.status || "published"}</dd>
+              </div>
+              <div>
+                <dt>Mileage</dt>
+                <dd>{listing.mileage_km ? `${listing.mileage_km} km` : "N/A"}</dd>
+              </div>
+              <div>
+                <dt>Body Type</dt>
+                <dd>{listing.body_type || "N/A"}</dd>
+              </div>
+              <div>
+                <dt>Color</dt>
+                <dd>{listing.color || "N/A"}</dd>
+              </div>
+              <div>
+                <dt>VIN</dt>
+                <dd>{listing.vin || "N/A"}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="stack-sm">
+            <h2>Contact Information</h2>
+            <dl className="detail-grid detail-grid-contact">
+              <div>
+                <dt>Contact Email</dt>
+                <dd>{listing.contact_email || "N/A"}</dd>
+              </div>
+              <div>
+                <dt>Contact Phone</dt>
+                <dd>{listing.contact_phone || "N/A"}</dd>
+              </div>
+            </dl>
+          </div>
 
           {listing.description && (
             <div className="stack-sm">
@@ -132,6 +145,9 @@ export default function ListingDetailPage() {
                     <img
                       src={imageHref(image.storage_path)}
                       alt="Listing"
+                      width="800"
+                      height="520"
+                      loading="lazy"
                       onError={(event) => {
                         event.currentTarget.style.display = "none";
                       }}

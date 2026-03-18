@@ -58,8 +58,11 @@ export default function LoginPage() {
         <label>
           Email
           <input
+            name="email"
             type="email"
             required
+            autoComplete="email"
+            spellCheck={false}
             value={form.email}
             onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
           />
@@ -68,15 +71,17 @@ export default function LoginPage() {
         <label>
           Password
           <input
+            name="password"
             type="password"
             required
+            autoComplete="current-password"
             value={form.password}
             onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
           />
         </label>
 
         <button className="button" type="submit" disabled={busy}>
-          {busy ? "Signing in..." : "Sign In"}
+          {busy ? "Signing In…" : "Sign In"}
         </button>
 
         <p className="muted">

@@ -78,10 +78,10 @@ export default function ProfilePage() {
         </dl>
 
         <div className="row-actions">
-          <button className="button" disabled={busy} onClick={reloadProfile}>
+          <button className="button" type="button" disabled={busy} onClick={reloadProfile}>
             Reload Profile
           </button>
-          <button className="button button-subtle" disabled={busy} onClick={rotateAccessToken}>
+          <button className="button button-subtle" type="button" disabled={busy} onClick={rotateAccessToken}>
             Refresh Access Token
           </button>
         </div>

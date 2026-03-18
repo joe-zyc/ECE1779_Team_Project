@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 
 import { listingsApi } from "../api/client";
 
+const API_ORIGIN = import.meta.env.VITE_API_BASE_URL
+  ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "")
+  : "http://localhost:3001";
+
 function toMoney(value) {
   if (value === null || value === undefined || value === "") {
     return "N/A";
@@ -34,10 +38,10 @@ function toImageUrl(storagePath) {
   const marker = "/storage/uploads/";
   const markerIndex = normalized.indexOf(marker);
   if (markerIndex >= 0) {
-    return `${import.meta.env.VITE_API_URL}${normalized.slice(markerIndex)}`;
+    return `${API_ORIGIN}${normalized.slice(markerIndex)}`;
   }
 
-  return `${import.meta.env.VITE_API_URL}/${normalized.replace(/^\.?\/?/, "")}`;
+  return `${API_ORIGIN}/${normalized.replace(/^\.?\/?/, "")}`;
 }
 
 export default function ListingCard({ listing, actions = [], compact = false }) {
@@ -93,6 +97,9 @@ export default function ListingCard({ listing, actions = [], compact = false }) 
           <img
             src={previewUrl}
             alt={title || "Car listing image"}
+            width="480"
+            height="320"
+            loading="lazy"
             onError={() => setPreviewError(true)}
           />
         ) : (
@@ -134,6 +141,7 @@ export default function ListingCard({ listing, actions = [], compact = false }) 
           {actions.map((action) => (
             <button
               key={action.label}
+              type="button"
               className={action.variant === "danger" ? "button button-danger" : "button button-subtle"}
               onClick={action.onClick}
               disabled={action.disabled}
