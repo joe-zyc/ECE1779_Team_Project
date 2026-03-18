@@ -29,7 +29,7 @@ export default function AppShell({ children }) {
         </div>
 
         <nav className="main-nav">
-          <NavLink to="/" className={navClassName}>
+          <NavLink to="/browse" className={navClassName}>
             Browse
           </NavLink>
 

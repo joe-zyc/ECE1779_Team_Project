@@ -49,7 +49,8 @@ export default function App() {
   return (
     <AppShell>
       <Routes>
-        <Route path="/" element={<PublicListingsPage />} />
+        <Route path="/" element={<SignupPage />} />
+        <Route path="/browse" element={<PublicListingsPage />} />
         <Route path="/listings/:id" element={<ListingDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
