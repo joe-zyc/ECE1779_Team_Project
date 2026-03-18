@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Notice from "../components/Notice";
 import { useAuth } from "../context/AuthContext";
@@ -14,11 +14,13 @@ const initialForm = {
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signup } = useAuth();
 
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const redirectTo = location.state?.redirectTo || "";
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -30,6 +32,7 @@ export default function SignupPage() {
       navigate("/login", {
         state: {
           signupMessage: "Account created. Please sign in.",
+          redirectTo,
         },
       });
     } catch (submitError) {

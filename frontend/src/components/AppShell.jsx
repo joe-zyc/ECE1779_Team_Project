@@ -22,7 +22,7 @@ export default function AppShell({ children }) {
           <span className="brand-dot" />
           <div>
             <p className="brand-kicker">ECE1779 Team 26</p>
-            <NavLink to="/" className="brand-link">
+            <NavLink to="/browse" className="brand-link">
               Used Car Atlas
             </NavLink>
           </div>

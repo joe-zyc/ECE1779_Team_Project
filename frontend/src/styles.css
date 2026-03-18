@@ -498,6 +498,14 @@ textarea:focus {
   gap: 8px;
 }
 
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 6px;
+}
+
 .detail-title-row {
   display: flex;
   justify-content: space-between;

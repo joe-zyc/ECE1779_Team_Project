@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
 import Notice from "./components/Notice";
 import { useAuth } from "./context/AuthContext";
 import BuyerPreferencesPage from "./pages/BuyerPreferencesPage";
+import ListingAccessPromptPage from "./pages/ListingAccessPromptPage";
 import ListingDetailPage from "./pages/ListingDetailPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -33,6 +34,25 @@ function ProtectedRoute({ roles, children }) {
   return children;
 }
 
+function ListingDetailRoute() {
+  const location = useLocation();
+  const { ready, isAuthenticated } = useAuth();
+
+  if (!ready) {
+    return <p className="muted">Checking session...</p>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <ListingAccessPromptPage
+        redirectTo={`${location.pathname}${location.search}${location.hash}`}
+      />
+    );
+  }
+
+  return <ListingDetailPage />;
+}
+
 function NotFoundPage() {
   return (
     <section className="stack-lg">
@@ -51,7 +71,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<SignupPage />} />
         <Route path="/browse" element={<PublicListingsPage />} />
-        <Route path="/listings/:id" element={<ListingDetailPage />} />
+        <Route path="/listings/:id" element={<ListingDetailRoute />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 

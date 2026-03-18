@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 
 import Notice from "../components/Notice";
 import { listingsApi } from "../api/client";
-import { useAuth } from "../context/AuthContext";
 
 function toCurrency(value) {
   if (value === null || value === undefined || value === "") {
@@ -40,12 +39,10 @@ function imageHref(storagePath) {
 
 export default function ListingDetailPage() {
   const { id } = useParams();
-  const { role, isAuthenticated, requestWithAuth } = useAuth();
 
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
 
   async function loadDetail() {
     setLoading(true);
@@ -66,27 +63,14 @@ export default function ListingDetailPage() {
     loadDetail();
   }, [id]);
 
-  async function handleReport() {
-    setInfo("");
-    setError("");
-
-    try {
-      await requestWithAuth(`/listings/${id}/report`, { method: "POST" });
-      setInfo("Listing reported successfully.");
-    } catch (reportError) {
-      setError(reportError.message || "Could not submit report.");
-    }
-  }
-
   return (
     <section className="stack-lg">
-      <Link to="/" className="back-link">
+      <Link to="/browse" className="back-link">
         Back to listings
       </Link>
 
       {loading && <p className="muted">Loading listing details...</p>}
       {error && <Notice kind="error">{error}</Notice>}
-      {info && <Notice kind="success">{info}</Notice>}
 
       {!loading && listing && (
         <article className="detail-panel">
@@ -99,12 +83,6 @@ export default function ListingDetailPage() {
               </h1>
               <p className="detail-price">{toCurrency(listing.price)}</p>
             </div>
-
-            {isAuthenticated && role === "buyer" && (
-              <button className="button button-danger" onClick={handleReport}>
-                Report Listing
-              </button>
-            )}
           </div>
 
           <dl className="detail-grid">

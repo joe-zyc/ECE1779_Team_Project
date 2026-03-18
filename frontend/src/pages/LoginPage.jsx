@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   const signupMessage = location.state?.signupMessage || "";
+  const redirectTo = location.state?.redirectTo || "";
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -22,7 +23,9 @@ export default function LoginPage() {
 
     try {
       const user = await login(form);
-      if (user?.role === "seller") {
+      if (redirectTo) {
+        navigate(redirectTo);
+      } else if (user?.role === "seller") {
         navigate("/seller");
       } else if (user?.role === "buyer") {
         navigate("/preferences");

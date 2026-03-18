@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import ListingCard from "../components/ListingCard";
 import Notice from "../components/Notice";
 import { listingsApi } from "../api/client";
-import { useAuth } from "../context/AuthContext";
+
+const PAGE_SIZE = 5;
 
 function compareListings(sortKey, left, right) {
   if (sortKey === "priceAsc") {
@@ -25,15 +26,14 @@ function compareListings(sortKey, left, right) {
 }
 
 export default function PublicListingsPage() {
-  const { isAuthenticated, role, requestWithAuth } = useAuth();
-
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState("newest");
+  const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [page, setPage] = useState(1);
 
   async function loadListings() {
     setLoading(true);
@@ -53,9 +53,14 @@ export default function PublicListingsPage() {
     loadListings();
   }, []);
 
-  const visibleListings = useMemo(() => {
+  const filteredListings = useMemo(() => {
     const lowered = query.trim().toLowerCase();
+    const minCandidate = minPrice === "" ? null : Number(minPrice);
     const cap = maxPrice === "" ? null : Number(maxPrice);
+    const hasMin = minCandidate !== null && !Number.isNaN(minCandidate);
+    const hasMax = cap !== null && !Number.isNaN(cap);
+    const lowerBound = hasMin && hasMax ? Math.min(minCandidate, cap) : minCandidate;
+    const upperBound = hasMin && hasMax ? Math.max(minCandidate, cap) : cap;
 
     return [...listings]
       .filter((listing) => {
@@ -70,30 +75,31 @@ export default function PublicListingsPage() {
           }
         }
 
-        if (cap !== null && !Number.isNaN(cap)) {
-          const price = Number(listing.price || 0);
-          if (price > cap) {
-            return false;
-          }
+        const price = Number(listing.price || 0);
+        if (lowerBound !== null && !Number.isNaN(lowerBound) && price < lowerBound) {
+          return false;
+        }
+        if (upperBound !== null && !Number.isNaN(upperBound) && price > upperBound) {
+          return false;
         }
 
         return true;
       })
       .sort((a, b) => compareListings(sortKey, a, b));
-  }, [listings, maxPrice, query, sortKey]);
+  }, [listings, minPrice, maxPrice, query, sortKey]);
 
-  async function reportListing(listingId) {
-    setInfo("");
-    setError("");
+  const totalPages = Math.max(1, Math.ceil(filteredListings.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const pagedListings = filteredListings.slice(startIndex, startIndex + PAGE_SIZE);
 
-    try {
-      await requestWithAuth(`/listings/${listingId}/report`, { method: "POST" });
-      setInfo("Report submitted. Thanks for keeping the marketplace healthy.");
-      await loadListings();
-    } catch (reportError) {
-      setError(reportError.message || "Could not submit report.");
-    }
-  }
+  useEffect(() => {
+    setPage(1);
+  }, [query, minPrice, maxPrice, sortKey]);
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, totalPages));
+  }, [totalPages]);
 
   return (
     <section className="stack-lg">
@@ -113,6 +119,17 @@ export default function PublicListingsPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="make, model, trim, color"
+          />
+        </label>
+
+        <label>
+          Min Price (CAD)
+          <input
+            type="number"
+            min="0"
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value)}
+            placeholder="optional"
           />
         </label>
 
@@ -143,45 +160,41 @@ export default function PublicListingsPage() {
         </button>
       </div>
 
-      {info && <Notice kind="success">{info}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
-
-      <div className="metrics-row">
-        <article>
-          <p className="metric-label">Listings visible</p>
-          <p className="metric-value">{visibleListings.length}</p>
-        </article>
-        <article>
-          <p className="metric-label">Auth status</p>
-          <p className="metric-value">{isAuthenticated ? "Signed In" : "Guest"}</p>
-        </article>
-        <article>
-          <p className="metric-label">Role mode</p>
-          <p className="metric-value">{role || "guest"}</p>
-        </article>
-      </div>
 
       {loading && <p className="muted">Loading listings...</p>}
 
-      {!loading && visibleListings.length === 0 && (
+      {!loading && filteredListings.length === 0 && (
         <Notice kind="info">No listings match your current filters.</Notice>
       )}
 
       <div className="listing-grid">
-        {visibleListings.map((listing) => {
-          const actions = [];
-
-          if (isAuthenticated && role === "buyer") {
-            actions.push({
-              label: "Report",
-              variant: "danger",
-              onClick: () => reportListing(listing.id),
-            });
-          }
-
-          return <ListingCard key={listing.id} listing={listing} actions={actions} />;
-        })}
+        {pagedListings.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} actions={[]} />
+        ))}
       </div>
+
+      {!loading && filteredListings.length > 0 && (
+        <div className="pagination-bar">
+          <button
+            className="button button-subtle"
+            disabled={currentPage <= 1}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            Previous
+          </button>
+          <p className="muted">
+            Page {currentPage} of {totalPages}
+          </p>
+          <button
+            className="button button-subtle"
+            disabled={currentPage >= totalPages}
+            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 }
