@@ -158,10 +158,6 @@ export default function BuyerPreferencesPage() {
       <article className="hero-panel">
         <p className="eyebrow">Buyer Preferences</p>
         <h1>Capture your ideal vehicle profile for future notification matching.</h1>
-        <p>
-          This page is fully wired to the planned preference APIs. If backend routes return 501, you will see a
-          readiness notice below.
-        </p>
       </article>
 
       {message && <Notice kind="success">{message}</Notice>}

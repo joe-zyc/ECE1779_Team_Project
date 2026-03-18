@@ -46,10 +46,15 @@ export default function SignupPage() {
     <section className="auth-grid">
       <article className="auth-side">
         <p className="eyebrow">Onboarding</p>
-        <h1>Build your buyer or seller identity in one step.</h1>
-        <p>
-          Choose a role now. The frontend enforces role-appropriate tools, and backend RBAC protects routes.
+        <h1>Start your OpenMotor journey.</h1>
+        <p className="auth-side-intro">
+          Create your account once and unlock the tools you need to buy smarter or sell faster.
         </p>
+        <div className="auth-side-highlights">
+          <p>Pick your role to get a tailored dashboard from day one.</p>
+          <p>Publish listings, manage preferences, and stay organized.</p>
+          <p>Join a trusted marketplace built for clear car transactions.</p>
+        </div>
       </article>
 
       <form className="panel stack-md" onSubmit={onSubmit}>

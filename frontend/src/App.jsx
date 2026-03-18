@@ -4,6 +4,7 @@ import AppShell from "./components/AppShell";
 import Notice from "./components/Notice";
 import { useAuth } from "./context/AuthContext";
 import BuyerPreferencesPage from "./pages/BuyerPreferencesPage";
+import LandingPage from "./pages/LandingPage";
 import ListingAccessPromptPage from "./pages/ListingAccessPromptPage";
 import ListingDetailPage from "./pages/ListingDetailPage";
 import LoginPage from "./pages/LoginPage";
@@ -69,7 +70,7 @@ export default function App() {
   return (
     <AppShell>
       <Routes>
-        <Route path="/" element={<SignupPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/browse" element={<PublicListingsPage />} />
         <Route path="/listings/:id" element={<ListingDetailRoute />} />
         <Route path="/login" element={<LoginPage />} />

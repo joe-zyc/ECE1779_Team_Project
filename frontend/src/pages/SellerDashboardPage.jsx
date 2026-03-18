@@ -183,10 +183,6 @@ export default function SellerDashboardPage() {
       <article className="hero-panel">
         <p className="eyebrow">Seller Hub</p>
         <h1>Manage your listing lifecycle from draft to published.</h1>
-        <p>
-          Owner-protected actions are wired to your backend RBAC routes. Keep entries detailed to improve
-          buyer matching quality.
-        </p>
       </article>
 
       {message && <Notice kind="success">{message}</Notice>}

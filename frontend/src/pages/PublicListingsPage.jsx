@@ -106,9 +106,6 @@ export default function PublicListingsPage() {
       <div className="hero-panel">
         <p className="eyebrow">Marketplace</p>
         <h1>Used cars, clearly organized for fast decisions.</h1>
-        <p>
-          Browse all published listings. Seller and buyer tools unlock after sign-in based on your role.
-        </p>
       </div>
 
       <div className="control-strip">

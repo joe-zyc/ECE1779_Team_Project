@@ -69,18 +69,13 @@ export default function AppShell({ children }) {
               <button className="ghost-button" type="button" onClick={onLogout}>
                 Log Out
               </button>
+              <span className="nav-user">{user?.display_name || "Signed-in user"}</span>
             </>
           )}
         </nav>
       </header>
 
       <main className="page-shell" id="main-content">
-        {isAuthenticated && (
-          <aside className="session-pill">
-            <p className="session-name">{user?.display_name || "Signed-in user"}</p>
-            <p className="session-meta">Role: {role}</p>
-          </aside>
-        )}
         {children}
       </main>
     </div>
