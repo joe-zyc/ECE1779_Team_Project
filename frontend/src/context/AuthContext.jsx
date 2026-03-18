@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { apiRequest, authApi } from "../api/client";
 
-const STORAGE_KEY = "ece1779_auth";
+const STORAGE_KEY = "openmotor_auth";
 
 const AuthContext = createContext(null);
 

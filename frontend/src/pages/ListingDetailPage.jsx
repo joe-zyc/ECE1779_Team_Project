@@ -152,7 +152,6 @@ export default function ListingDetailPage() {
                         event.currentTarget.style.display = "none";
                       }}
                     />
-                    <figcaption>{image.storage_path}</figcaption>
                   </figure>
                 ))}
               </div>

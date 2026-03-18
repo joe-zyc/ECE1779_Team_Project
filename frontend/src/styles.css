@@ -147,12 +147,13 @@ textarea:focus-visible {
   gap: 12px;
 }
 
-.brand-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(130deg, #ff9e45, #ff6f3d);
-  box-shadow: 0 0 0 4px rgba(255, 158, 69, 0.2);
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 16px rgba(2, 10, 20, 0.28);
 }
 
 .brand-kicker {
@@ -624,6 +625,14 @@ textarea:focus {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.form-grid-single {
+  grid-template-columns: 1fr;
+}
+
+.form-grid-single .form-span-2 {
+  grid-column: span 1;
 }
 
 .form-span-2 {

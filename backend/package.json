@@ -1,8 +1,8 @@
 {
-  "name": "ece1779-team26-backend",
+  "name": "openmotor-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "backend for the ECE1779 used-car marketplace project for team 26",
+  "description": "backend for the openmotor used-car marketplace backend",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

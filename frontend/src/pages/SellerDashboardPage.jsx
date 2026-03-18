@@ -54,9 +54,10 @@ export default function SellerDashboardPage() {
   const [message, setMessage] = useState("");
 
   const [createForm, setCreateForm] = useState(initialListingForm);
+  const [createImages, setCreateImages] = useState(null);
+  const [createImageInputKey, setCreateImageInputKey] = useState(0);
   const [editListingId, setEditListingId] = useState("");
   const [editForm, setEditForm] = useState(initialListingForm);
-  const [uploadFiles, setUploadFiles] = useState({});
 
   async function loadMyListings() {
     setLoading(true);
@@ -83,13 +84,43 @@ export default function SellerDashboardPage() {
     setMessage("");
 
     try {
-      await requestWithAuth("/listings", {
+      const createResponse = await requestWithAuth("/listings", {
         method: "POST",
         body: buildPayload(createForm),
       });
+
+      const createdListingId = createResponse?.data?.id;
+      let uploadFailedMessage = "";
+
+      if (createdListingId && createImages && createImages.length > 0) {
+        const formData = new FormData();
+        Array.from(createImages).forEach((file) => {
+          formData.append("images", file);
+        });
+
+        try {
+          await requestWithAuth(`/listings/${createdListingId}/images`, {
+            method: "POST",
+            body: formData,
+            isFormData: true,
+          });
+          setMessage("Listing created and images uploaded.");
+        } catch (uploadError) {
+          uploadFailedMessage = uploadError.message || "Image upload failed.";
+          setMessage("Listing created as draft.");
+        }
+      } else {
+        setMessage("Listing created as draft.");
+      }
+
       setCreateForm(initialListingForm);
-      setMessage("Listing created as draft.");
+      setCreateImages(null);
+      setCreateImageInputKey((current) => current + 1);
       await loadMyListings();
+
+      if (uploadFailedMessage) {
+        setError(`Listing was created, but image upload failed: ${uploadFailedMessage}`);
+      }
     } catch (createError) {
       setError(createError.message || "Failed to create listing.");
     } finally {
@@ -147,37 +178,6 @@ export default function SellerDashboardPage() {
     }
   }
 
-  async function uploadImages(listingId) {
-    const fileList = uploadFiles[listingId];
-    if (!fileList || fileList.length === 0) {
-      return;
-    }
-
-    const formData = new FormData();
-    Array.from(fileList).forEach((file) => {
-      formData.append("images", file);
-    });
-
-    setBusy(true);
-    setError("");
-    setMessage("");
-
-    try {
-      await requestWithAuth(`/listings/${listingId}/images`, {
-        method: "POST",
-        body: formData,
-        isFormData: true,
-      });
-      setMessage("Images uploaded.");
-      setUploadFiles((current) => ({ ...current, [listingId]: null }));
-      await loadMyListings();
-    } catch (uploadError) {
-      setError(uploadError.message || "Failed to upload images.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <section className="stack-lg">
       <article className="hero-panel">
@@ -194,7 +194,7 @@ export default function SellerDashboardPage() {
 
       <form className="panel stack-md" onSubmit={createListing}>
         <h2>Create Listing</h2>
-        <div className="form-grid">
+        <div className="form-grid form-grid-single">
           {Object.entries(createForm).map(([field, value]) => {
             const isRequired = ["make", "model", "year", "price"].includes(field);
             const label = field.replaceAll("_", " ");
@@ -231,6 +231,20 @@ export default function SellerDashboardPage() {
               </label>
             );
           })}
+          <label>
+            Upload Images (optional)
+            <input
+              key={createImageInputKey}
+              name="images"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={(event) => setCreateImages(event.target.files)}
+            />
+            {createImages && createImages.length > 0 ? (
+              <small className="muted">{createImages.length} file(s) selected</small>
+            ) : null}
+          </label>
         </div>
 
         <button className="button" disabled={busy} type="submit">
@@ -297,7 +311,7 @@ export default function SellerDashboardPage() {
                   </div>
 
                   {isEditing && (
-                    <div className="form-grid">
+                    <div className="form-grid form-grid-single">
                       {Object.entries(editForm).map(([field, value]) => {
                         const label = field.replaceAll("_", " ");
                         const inputType = numericFields.has(field) ? "number" : "text";
@@ -333,30 +347,6 @@ export default function SellerDashboardPage() {
                       })}
                     </div>
                   )}
-
-                  <label>
-                    Upload Images
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      multiple
-                      onChange={(event) =>
-                        setUploadFiles((current) => ({
-                          ...current,
-                          [listing.id]: event.target.files,
-                        }))
-                      }
-                    />
-                  </label>
-
-                  <button
-                    className="button button-subtle"
-                    type="button"
-                    disabled={!uploadFiles[listing.id] || uploadFiles[listing.id].length === 0 || busy}
-                    onClick={() => uploadImages(listing.id)}
-                  >
-                    Upload Selected Images
-                  </button>
                 </div>
               </article>
             );

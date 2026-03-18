@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 
+import logo from "../asset/logo.png";
 import { useAuth } from "../context/AuthContext";
 
 function navClassName({ isActive }) {
@@ -23,11 +24,11 @@ export default function AppShell({ children }) {
 
       <header className="topbar">
         <div className="brand-wrap">
-          <span className="brand-dot" />
+          <img className="brand-logo" src={logo} alt="OpenMotor logo" />
           <div>
-            <p className="brand-kicker">ECE1779 Team 26</p>
+            <p className="brand-kicker">Team 26</p>
             <NavLink to="/browse" className="brand-link">
-              Used Car Atlas
+              OpenMotor
             </NavLink>
           </div>
         </div>
