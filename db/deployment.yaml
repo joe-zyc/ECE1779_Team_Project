@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmotor-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openmotor-db
+  template:
+    metadata:
+      labels:
+        app: openmotor-db
+    spec:
+      containers:
+        - name: openmotor-db
+          image: postgres:17
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/pgdata
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: openmotor-db-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: openmotor_db
+            - name: POSTGRES_USER
+              value: openmotor_user
+          volumeMounts:
+            - name: openmotor-db-storage
+              mountPath: /var/lib/postgresql
+      volumes:
+        - name: openmotor-db-storage
+          persistentVolumeClaim:
+            claimName: openmotor-db-pvc
