@@ -1,10 +1,15 @@
 const { Pool } = require("pg");
 const path = require("path");
+const { env } = require("../../config/env");
 
 //const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: env.dbHost,
+  port: env.dbPort,
+  database: env.dbName,
+  user: env.dbUser,
+  password: env.dbPassword,
 });
 
 function toPublicStoragePath(filePath) {
