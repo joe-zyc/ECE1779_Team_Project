@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 const path = require("path");
 
-//const { notifyMatchingBuyers } = require("../../services/notification.service");
+const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -245,7 +245,10 @@ const publishListing = async (req, res, next) => {
 
     const listing = result.rows[0];
 
-    await notifyMatchingBuyers(listing);
+    // Fire-and-forget: notification failure must not block the publish response
+    notifyMatchingBuyers(listing).catch((err) => {
+      console.error("[notify] Failed to send buyer notifications:", err.message);
+    });
 
     res.json({ data: listing });
   } catch (err) {
