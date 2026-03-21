@@ -14,8 +14,8 @@ spec:
           restartPolicy: OnFailure
 
           containers:
-            - name: notification-worker
-              image: YOUR_DOCKER_IMAGE:latest
+            - name: openmotor-notification-worker
+              image: openmotor-notification-worker:latest
 
               command: ["node", "index.js"]
 
@@ -23,23 +23,23 @@ spec:
                 - name: DATABASE_URL
                   valueFrom:
                     secretKeyRef:
-                      name: app-secret
+                      name: openmotor-notification-secret
                       key: DATABASE_URL
 
                 - name: SENDGRID_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: app-secret
+                      name: openmotor-notification-secret
                       key: SENDGRID_API_KEY
 
                 - name: SENDGRID_FROM_EMAIL
                   valueFrom:
                     secretKeyRef:
-                      name: app-secret
+                      name: openmotor-notification-secret
                       key: SENDGRID_FROM_EMAIL
 
                 - name: APP_BASE_URL
                   valueFrom:
                     secretKeyRef:
-                      name: app-secret
+                      name: openmotor-notification-secret
                       key: APP_BASE_URL

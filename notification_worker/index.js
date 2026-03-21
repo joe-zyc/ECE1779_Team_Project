@@ -1,8 +1,8 @@
-require("dotenv").config({ path: "../backend/.env" });
+require("dotenv").config();
 
 const { Pool } = require("pg");
 const sgMail = require("@sendgrid/mail");
-
+const MAX_LISTINGS_PER_BUYER = 3;
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
 if (!process.env.SENDGRID_API_KEY) throw new Error("SENDGRID_API_KEY is required");
@@ -71,36 +71,28 @@ async function fetchMatches(client) {
   return result.rows;
 }
 
-function buildEmail(match) {
-  const listingUrl = buildListingUrl(match.listing_id);
+function buildEmailForMultipleListings(firstMatch, matches) {
+  const listingsHtml = matches.map(m => `
+    <li>
+      <strong>${m.year} ${m.make} ${m.model}</strong><br/>
+      Price: ${formatPrice(m.price)}<br/>
+      Mileage: ${m.mileage_km ?? "N/A"} km<br/>
+      <a href="${buildListingUrl(m.listing_id)}">View listing</a>
+    </li>
+  `).join("");
 
   return {
-    to: match.buyer_email,
+    to: firstMatch.buyer_email,
     from: process.env.SENDGRID_FROM_EMAIL,
-    subject: `New listing match: ${match.year} ${match.make} ${match.model}`,
+    subject: `New listings matching your preferences`,
     html: `
-      <p>Hello ${match.buyer_name || "Buyer"},</p>
-      <p>A new listing matches your saved preference:</p>
+      <p>Hello ${firstMatch.buyer_name || "Buyer"},</p>
+      <p>Here are new listings that match your preferences:</p>
       <ul>
-        <li><strong>Vehicle:</strong> ${match.year} ${match.make} ${match.model} ${match.trim || ""}</li>
-        <li><strong>Price:</strong> ${formatPrice(match.price)}</li>
-        <li><strong>Mileage:</strong> ${match.mileage_km ?? "N/A"} km</li>
-        <li><strong>Color:</strong> ${match.color || "N/A"}</li>
+        ${listingsHtml}
       </ul>
-      <p><a href="${listingUrl}">View listing</a></p>
-    `,
-  };
-}
-
-async function insertNotificationRecord(client, listingId, buyerId) {
-  await client.query(
     `
-      INSERT INTO listing_notifications (id, listing_id, buyer_id, sent_at)
-      VALUES (gen_random_uuid(), $1, $2, NOW())
-      ON CONFLICT (listing_id, buyer_id) DO NOTHING
-    `,
-    [listingId, buyerId]
-  );
+  };
 }
 
 async function runJob() {
@@ -108,36 +100,49 @@ async function runJob() {
 
   try {
     const matches = await fetchMatches(client);
+    const matchesByBuyer = {};
     console.log(`Found ${matches.length} matches`);
 
-    for (const match of matches) {
-      try {
-        const email = buildEmail(match);
-        console.log("Sending to:", email.to);
-        console.log("Sending from:", email.from);
-        console.log("Subject:", email.subject);
-        await sgMail.send(email);
-        await insertNotificationRecord(client, match.listing_id, match.buyer_id);
-
-        console.log(
-          `Sent email for listing ${match.listing_id} to buyer ${match.buyer_id}`
-        );
-      } catch (err) {
-        console.error(
-        `Failed for listing ${match.listing_id}, buyer ${match.buyer_id}:`,
-        err.message
-        );
-
-        if (err.response && err.response.body) {
-          console.error("SendGrid error body:", JSON.stringify(err.response.body, null, 2));
-  }
-}
+  for (const match of matches) {
+    if (!matchesByBuyer[match.buyer_id]) {
+      matchesByBuyer[match.buyer_id] = [];
     }
+    matchesByBuyer[match.buyer_id].push(match);
+  }
+
+  for (const buyerId in matchesByBuyer) {
+    const buyerMatches = matchesByBuyer[buyerId]
+      .sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
+      .slice(0, MAX_LISTINGS_PER_BUYER);
+
+    const firstMatch = buyerMatches[0];
+
+    try {
+      const email = buildEmailForMultipleListings(firstMatch, buyerMatches);
+
+      console.log("Sending to:", email.to);
+      console.log("Sending from:", email.from);
+      console.log("Subject:", email.subject);
+
+      await sgMail.send(email);
+
+      console.log(`Sent ${buyerMatches.length} listings to buyer ${buyerId}`);
+    } catch (err) {
+      console.error(`Failed for buyer ${buyerId}:`, err.message);
+
+      if (err.response && err.response.body) {
+        console.error(
+          "SendGrid error body:",
+          JSON.stringify(err.response.body, null, 2)
+        );
+      }
+    }
+  }
   } finally {
     client.release();
     await pool.end();
+    }
   }
-}
 
 runJob()
   .then(() => {
