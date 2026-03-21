@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmotor-frontend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: openmotor-frontend
+  template:
+    metadata:
+      labels:
+        app: openmotor-frontend
+    spec:
+      containers:
+        - name: openmotor-frontend
+          image: openmotor-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: VITE_API_BASE_URL
+              value: "http://openmotor-backend-service:3000/api/v1"
+            - name: PORT
+              value: "8080"
+          
+            

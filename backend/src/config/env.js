@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
-  port: Number(process.env.PORT || 3001),
+  port: Number(process.env.PORT || 3000),
   apiBasePath: process.env.API_BASE_PATH || "/api/v1",
   dbHost: process.env.DB_HOST || "",
   dbPort: Number(process.env.DB_PORT || 5432),
