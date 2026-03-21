@@ -113,6 +113,9 @@ async function runJob() {
     for (const match of matches) {
       try {
         const email = buildEmail(match);
+        console.log("Sending to:", email.to);
+        console.log("Sending from:", email.from);
+        console.log("Subject:", email.subject);
         await sgMail.send(email);
         await insertNotificationRecord(client, match.listing_id, match.buyer_id);
 
@@ -121,10 +124,14 @@ async function runJob() {
         );
       } catch (err) {
         console.error(
-          `Failed for listing ${match.listing_id}, buyer ${match.buyer_id}:`,
-          err.message
+        `Failed for listing ${match.listing_id}, buyer ${match.buyer_id}:`,
+        err.message
         );
-      }
+
+        if (err.response && err.response.body) {
+          console.error("SendGrid error body:", JSON.stringify(err.response.body, null, 2));
+  }
+}
     }
   } finally {
     client.release();
