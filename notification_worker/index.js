@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../backend/.env" });
 
 const { Pool } = require("pg");
 const sgMail = require("@sendgrid/mail");

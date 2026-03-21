@@ -7,4 +7,4 @@ RUN npm install --omit=dev
 
 COPY . .
 
-CMD ["node", "notification-worker/index.js"]
+CMD ["node", "index.js"]

@@ -17,7 +17,7 @@ spec:
             - name: notification-worker
               image: YOUR_DOCKER_IMAGE:latest
 
-              command: ["node", "notification-worker/index.js"]
+              command: ["node", "index.js"]
 
               env:
                 - name: DATABASE_URL
