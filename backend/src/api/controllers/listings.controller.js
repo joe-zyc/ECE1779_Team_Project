@@ -1,6 +1,6 @@
 const { Pool } = require("pg");
 const path = require("path");
-
+const buyerService = require("../services/buyer_service");
 //const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
@@ -42,54 +42,36 @@ const UPDATABLE_FIELDS = [
    GET /listings
    Public listings
 --------------------------- */
-const listPublicListings = async (req, res, next) => {
+const listPublicListings = async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT * FROM car_listings
-       WHERE status = 'published'
-       ORDER BY published_at DESC`
-    );
 
-    res.json({ data: result.rows });
-  } catch (err) {
-    next(err);
+    const filters = req.query;
+
+    const listings = await buyerService.getPublishedListings(filters);
+    
+    return res.status(200).json({ data: listings });
+  } catch (error) {
+    console.error("listPublicListings error:", error);
+    return res.status(500).json({ message: "Failed to fetch published listings." });
   }
 };
 
 /* ---------------------------
    GET /listings/:id
 --------------------------- */
-const getListingById = async (req, res, next) => {
+const getListingById = async (req, res) => {
   try {
     const { id } = req.params;
+    const listing = await buyerService.getPublishedListingById(id);
 
-    const listing = await pool.query(
-      `SELECT * FROM car_listings WHERE id=$1`,
-      [id]
-    );
-
-    if (listing.rows.length === 0) {
-      return res.status(404).json({ error: "Listing not found" });
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found." });
     }
 
-    const images = await pool.query(
-      `SELECT * FROM car_listing_images WHERE listing_id=$1`,
-      [id]
-    );
-
-    const imagesWithPublicPath = images.rows.map((image) => ({
-      ...image,
-      storage_path: toPublicStoragePath(image.storage_path),
-    }));
-
-    res.json({
-      data: {
-        ...listing.rows[0],
-        images: imagesWithPublicPath,
-      },
-    });
-  } catch (err) {
-    next(err);
+    return res.status(200).json({ data: listing });
+  } catch (error) {
+    console.error("getListingById error:", error);
+    return res.status(500).json({ message: "Failed to fetch listing detail." });
   }
 };
 
