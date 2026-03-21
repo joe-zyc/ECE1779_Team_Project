@@ -5,7 +5,13 @@ const { Pool } = require("pg");
 const { AppError } = require("../../core/http/errors");
 const { env } = require("../../config/env");
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({
+  host: env.dbHost,
+  port: env.dbPort,
+  database: env.dbName,
+  user: env.dbUser,
+  password: env.dbPassword,
+});
 
 /* ---------------------------
    POST /auth/signup

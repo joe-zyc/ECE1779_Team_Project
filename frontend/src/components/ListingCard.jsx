@@ -5,7 +5,7 @@ import { listingsApi } from "../api/client";
 
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL
   ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "")
-  : "http://localhost:3001";
+  : "http://localhost:3000";
 
 function toMoney(value) {
   if (value === null || value === undefined || value === "") {
@@ -50,6 +50,7 @@ export default function ListingCard({ listing, actions = [], compact = false }) 
     .join(" ");
 
   const seededPreviewPath =
+    listing.thumbnail_path ||
     listing.preview_image_path ||
     listing.image_url ||
     (Array.isArray(listing.images) && listing.images[0] ? listing.images[0].storage_path : "");
@@ -63,7 +64,7 @@ export default function ListingCard({ listing, actions = [], compact = false }) 
     setPreviewPath(seededPreviewPath || "");
     setPreviewError(false);
 
-    if (seededPreviewPath || !listing.id) {
+    if (seededPreviewPath || !listing.id || (listing.status && listing.status !== "published")) {
       return () => {
         cancelled = true;
       };

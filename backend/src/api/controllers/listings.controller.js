@@ -1,10 +1,15 @@
 const { Pool } = require("pg");
 const path = require("path");
+const { env } = require("../../config/env");
 
 //const { notifyMatchingBuyers } = require("../../services/notification.service");
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: env.dbHost,
+  port: env.dbPort,
+  database: env.dbName,
+  user: env.dbUser,
+  password: env.dbPassword,
 });
 
 function toPublicStoragePath(filePath) {
@@ -44,13 +49,133 @@ const UPDATABLE_FIELDS = [
 --------------------------- */
 const listPublicListings = async (req, res, next) => {
   try {
-    const result = await pool.query(
-      `SELECT * FROM car_listings
-       WHERE status = 'published'
-       ORDER BY published_at DESC`
-    );
+    const {
+      make,
+      model,
+      trim,
+      bodyType,
+      color,
+      yearMin,
+      yearMax,
+      priceMin,
+      priceMax,
+      mileageMin,
+      mileageMax,
+      sort,
+      order,
+      page,
+      limit,
+    } = req.query;
 
-    res.json({ data: result.rows });
+    const conditions = [`status = 'published'`];
+    const values = [];
+    let index = 1;
+
+    if (make) {
+      conditions.push(`make ILIKE $${index++}`);
+      values.push(make);
+    }
+
+    if (model) {
+      conditions.push(`model ILIKE $${index++}`);
+      values.push(model);
+    }
+
+    if (trim) {
+      conditions.push(`trim ILIKE $${index++}`);
+      values.push(trim);
+    }
+
+    if (bodyType) {
+      conditions.push(`body_type ILIKE $${index++}`);
+      values.push(bodyType);
+    }
+
+    if (color) {
+      conditions.push(`color ILIKE $${index++}`);
+      values.push(color);
+    }
+
+    if (yearMin) {
+      conditions.push(`year >= $${index++}`);
+      values.push(Number(yearMin));
+    }
+
+    if (yearMax) {
+      conditions.push(`year <= $${index++}`);
+      values.push(Number(yearMax));
+    }
+
+    if (priceMin) {
+      conditions.push(`price >= $${index++}`);
+      values.push(Number(priceMin));
+    }
+
+    if (priceMax) {
+      conditions.push(`price <= $${index++}`);
+      values.push(Number(priceMax));
+    }
+
+    if (mileageMin) {
+      conditions.push(`mileage_km >= $${index++}`);
+      values.push(Number(mileageMin));
+    }
+
+    if (mileageMax) {
+      conditions.push(`mileage_km <= $${index++}`);
+      values.push(Number(mileageMax));
+    }
+
+    const allowedSortFields = [
+      "price",
+      "year",
+      "mileage_km",
+      "created_at",
+      "published_at",
+    ];
+
+    const sortField = allowedSortFields.includes(sort) ? sort : "published_at";
+    const sortOrder = String(order).toLowerCase() === "asc" ? "ASC" : "DESC";
+
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+    const offset = (pageNum - 1) * limitNum;
+
+    const listingsQuery = `
+      SELECT
+        l.*,
+        (
+          SELECT storage_path
+          FROM car_listing_images i
+          WHERE i.listing_id = l.id
+          ORDER BY i.created_at ASC, i.id ASC
+          LIMIT 1
+        ) AS thumbnail_path
+      FROM car_listings l
+      WHERE ${conditions.join(" AND ")}
+      ORDER BY ${sortField} ${sortOrder}
+      LIMIT $${index++}
+      OFFSET $${index++}
+    `;
+
+    values.push(limitNum, offset);
+
+    const listingsResult = await pool.query(listingsQuery, values);
+
+    const data = listingsResult.rows.map((listing) => ({
+      ...listing,
+      thumbnail_path: listing.thumbnail_path
+        ? toPublicStoragePath(listing.thumbnail_path)
+        : null,
+    }));
+
+    res.json({
+      data,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+      },
+    });
   } catch (err) {
     next(err);
   }
@@ -64,8 +189,8 @@ const getListingById = async (req, res, next) => {
     const { id } = req.params;
 
     const listing = await pool.query(
-      `SELECT * FROM car_listings WHERE id=$1`,
-      [id]
+      'SELECT * FROM car_listings WHERE id=$1 AND status=$2',
+      [id, 'published']
     );
 
     if (listing.rows.length === 0) {
@@ -73,7 +198,7 @@ const getListingById = async (req, res, next) => {
     }
 
     const images = await pool.query(
-      `SELECT * FROM car_listing_images WHERE listing_id=$1`,
+      'SELECT * FROM car_listing_images WHERE listing_id=$1 ORDER BY created_at ASC, id ASC',
       [id]
     );
 

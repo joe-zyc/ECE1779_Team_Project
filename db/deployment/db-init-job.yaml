@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openmotor-db-init-job
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-init
+          image: postgres:17
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/pgdata
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: openmotor-db-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: openmotor_db
+            - name: POSTGRES_USER
+              value: openmotor_user
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              until pg_isready -h openmotor-db-service -p 5432; do
+                echo "Waiting for database to be ready..."
+                sleep 2
+              done
+
+              echo "Database is ready. Running initialization SQL..."
+              psql -h openmotor-db-service -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /scripts/init.sql
+          volumeMounts:
+            - name: openmotor-db-init-sql-volume
+              mountPath: /scripts
+      volumes:
+        - name: openmotor-db-init-sql-volume
+          configMap:
+            name: openmotor-db-init-sql

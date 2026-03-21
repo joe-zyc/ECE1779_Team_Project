@@ -1,105 +1,163 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import ListingCard from "../components/ListingCard";
 import Notice from "../components/Notice";
 import { listingsApi } from "../api/client";
 
 const PAGE_SIZE = 5;
+const initialFilters = {
+  make: "",
+  model: "",
+  trim: "",
+  bodyType: "",
+  color: "",
+  yearMin: "",
+  yearMax: "",
+  mileageMin: "",
+  mileageMax: "",
+  priceMin: "",
+  priceMax: "",
+};
 
-function compareListings(sortKey, left, right) {
+function normalizeFilters(filters) {
+  const normalized = { ...initialFilters };
+
+  Object.keys(initialFilters).forEach((key) => {
+    normalized[key] = String(filters?.[key] ?? "").trim();
+  });
+
+  return normalized;
+}
+
+function toLikePattern(value) {
+  const trimmed = String(value || "").trim();
+  return trimmed ? `%${trimmed}%` : undefined;
+}
+
+function toNumericFilter(value) {
+  if (value === "") {
+    return undefined;
+  }
+
+  const numeric = Number(value);
+  return Number.isNaN(numeric) ? undefined : numeric;
+}
+
+function mapSortToApi(sortKey) {
   if (sortKey === "priceAsc") {
-    return Number(left.price || 0) - Number(right.price || 0);
+    return { sort: "price", order: "asc" };
   }
   if (sortKey === "priceDesc") {
-    return Number(right.price || 0) - Number(left.price || 0);
+    return { sort: "price", order: "desc" };
   }
   if (sortKey === "yearDesc") {
-    return Number(right.year || 0) - Number(left.year || 0);
+    return { sort: "year", order: "desc" };
   }
   if (sortKey === "mileageAsc") {
-    return Number(left.mileage_km || 0) - Number(right.mileage_km || 0);
+    return { sort: "mileage_km", order: "asc" };
   }
 
-  const leftTime = new Date(left.published_at || left.created_at || 0).getTime();
-  const rightTime = new Date(right.published_at || right.created_at || 0).getTime();
-  return rightTime - leftTime;
+  return { sort: "published_at", order: "desc" };
+}
+
+function buildQueryParams(filters, sortKey, page) {
+  const sort = mapSortToApi(sortKey);
+
+  return {
+    ...sort,
+    page,
+    limit: PAGE_SIZE,
+    make: toLikePattern(filters.make),
+    model: toLikePattern(filters.model),
+    trim: toLikePattern(filters.trim),
+    bodyType: toLikePattern(filters.bodyType),
+    color: toLikePattern(filters.color),
+    yearMin: toNumericFilter(filters.yearMin),
+    yearMax: toNumericFilter(filters.yearMax),
+    mileageMin: toNumericFilter(filters.mileageMin),
+    mileageMax: toNumericFilter(filters.mileageMax),
+    priceMin: toNumericFilter(filters.priceMin),
+    priceMax: toNumericFilter(filters.priceMax),
+  };
 }
 
 export default function PublicListingsPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("");
+  const [filterInputs, setFilterInputs] = useState(initialFilters);
+  const [activeFilters, setActiveFilters] = useState(initialFilters);
   const [sortKey, setSortKey] = useState("newest");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
   const [page, setPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(PAGE_SIZE);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const latestRequestRef = useRef(0);
 
-  async function loadListings() {
+  const loadListings = useCallback(async () => {
+    const requestId = latestRequestRef.current + 1;
+    latestRequestRef.current = requestId;
+
     setLoading(true);
     setError("");
 
     try {
-      const response = await listingsApi.listPublic();
-      setListings(Array.isArray(response.data) ? response.data : []);
+      const response = await listingsApi.listPublic(buildQueryParams(activeFilters, sortKey, page));
+      const nextListings = Array.isArray(response.data) ? response.data : [];
+      const apiLimit = Number(response?.pagination?.limit);
+      const safeLimit = Number.isFinite(apiLimit) && apiLimit > 0 ? apiLimit : PAGE_SIZE;
+
+      if (requestId !== latestRequestRef.current) {
+        return;
+      }
+
+      setListings(nextListings);
+      setPageLimit(safeLimit);
+      setHasNextPage(nextListings.length >= safeLimit);
     } catch (loadError) {
+      if (requestId !== latestRequestRef.current) {
+        return;
+      }
       setError(loadError.message || "Failed to load listings.");
     } finally {
-      setLoading(false);
+      if (requestId === latestRequestRef.current) {
+        setLoading(false);
+      }
     }
-  }
+  }, [activeFilters, page, sortKey]);
 
   useEffect(() => {
     loadListings();
-  }, []);
+  }, [loadListings, refreshTick]);
 
-  const filteredListings = useMemo(() => {
-    const lowered = query.trim().toLowerCase();
-    const minCandidate = minPrice === "" ? null : Number(minPrice);
-    const cap = maxPrice === "" ? null : Number(maxPrice);
-    const hasMin = minCandidate !== null && !Number.isNaN(minCandidate);
-    const hasMax = cap !== null && !Number.isNaN(cap);
-    const lowerBound = hasMin && hasMax ? Math.min(minCandidate, cap) : minCandidate;
-    const upperBound = hasMin && hasMax ? Math.max(minCandidate, cap) : cap;
+  function updateFilterInput(field, value) {
+    setFilterInputs((current) => ({ ...current, [field]: value }));
+  }
 
-    return [...listings]
-      .filter((listing) => {
-        if (lowered) {
-          const haystack = [listing.make, listing.model, listing.trim, listing.color]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-          if (!haystack.includes(lowered)) {
-            return false;
-          }
-        }
-
-        const price = Number(listing.price || 0);
-        if (lowerBound !== null && !Number.isNaN(lowerBound) && price < lowerBound) {
-          return false;
-        }
-        if (upperBound !== null && !Number.isNaN(upperBound) && price > upperBound) {
-          return false;
-        }
-
-        return true;
-      })
-      .sort((a, b) => compareListings(sortKey, a, b));
-  }, [listings, minPrice, maxPrice, query, sortKey]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredListings.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const pagedListings = filteredListings.slice(startIndex, startIndex + PAGE_SIZE);
-
-  useEffect(() => {
+  function applyFilters(event) {
+    event.preventDefault();
+    const normalizedFilters = normalizeFilters(filterInputs);
+    setFilterInputs(normalizedFilters);
+    setActiveFilters(normalizedFilters);
     setPage(1);
-  }, [query, minPrice, maxPrice, sortKey]);
+    setRefreshTick((current) => current + 1);
+  }
 
-  useEffect(() => {
-    setPage((current) => Math.min(current, totalPages));
-  }, [totalPages]);
+  function clearFilters() {
+    const resetFilters = { ...initialFilters };
+    setFilterInputs(resetFilters);
+    setActiveFilters(resetFilters);
+    setPage(1);
+    setRefreshTick((current) => current + 1);
+  }
+
+  function refreshListings() {
+    const normalizedFilters = normalizeFilters(filterInputs);
+    setFilterInputs(normalizedFilters);
+    setActiveFilters(normalizedFilters);
+    setPage(1);
+    setRefreshTick((current) => current + 1);
+  }
 
   return (
     <section className="stack-lg">
@@ -108,15 +166,59 @@ export default function PublicListingsPage() {
         <h1>Used cars, clearly organized for fast decisions.</h1>
       </div>
 
-      <div className="control-strip">
+      <form className="control-strip" onSubmit={applyFilters}>
         <label>
-          Search
+          Make
           <input
-            name="search"
+            name="make"
             type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="make, model, trim, color…"
+            value={filterInputs.make}
+            onChange={(event) => updateFilterInput("make", event.target.value)}
+            placeholder="e.g. Toyota"
+          />
+        </label>
+
+        <label>
+          Model
+          <input
+            name="model"
+            type="text"
+            value={filterInputs.model}
+            onChange={(event) => updateFilterInput("model", event.target.value)}
+            placeholder="e.g. Corolla"
+          />
+        </label>
+
+        <label>
+          Trim
+          <input
+            name="trim"
+            type="text"
+            value={filterInputs.trim}
+            onChange={(event) => updateFilterInput("trim", event.target.value)}
+            placeholder="e.g. LE"
+          />
+        </label>
+
+        <label>
+          Body Type
+          <input
+            name="body_type"
+            type="text"
+            value={filterInputs.bodyType}
+            onChange={(event) => updateFilterInput("bodyType", event.target.value)}
+            placeholder="e.g. SUV"
+          />
+        </label>
+
+        <label>
+          Color
+          <input
+            name="color"
+            type="text"
+            value={filterInputs.color}
+            onChange={(event) => updateFilterInput("color", event.target.value)}
+            placeholder="e.g. Blue"
           />
         </label>
 
@@ -126,8 +228,8 @@ export default function PublicListingsPage() {
             name="min_price"
             type="number"
             min="0"
-            value={minPrice}
-            onChange={(event) => setMinPrice(event.target.value)}
+            value={filterInputs.priceMin}
+            onChange={(event) => updateFilterInput("priceMin", event.target.value)}
             placeholder="Optional…"
           />
         </label>
@@ -138,15 +240,70 @@ export default function PublicListingsPage() {
             name="max_price"
             type="number"
             min="0"
-            value={maxPrice}
-            onChange={(event) => setMaxPrice(event.target.value)}
+            value={filterInputs.priceMax}
+            onChange={(event) => updateFilterInput("priceMax", event.target.value)}
+            placeholder="Optional…"
+          />
+        </label>
+
+        <label>
+          Min Year
+          <input
+            name="min_year"
+            type="number"
+            min="1900"
+            value={filterInputs.yearMin}
+            onChange={(event) => updateFilterInput("yearMin", event.target.value)}
+            placeholder="Optional…"
+          />
+        </label>
+
+        <label>
+          Max Year
+          <input
+            name="max_year"
+            type="number"
+            min="1900"
+            value={filterInputs.yearMax}
+            onChange={(event) => updateFilterInput("yearMax", event.target.value)}
+            placeholder="Optional…"
+          />
+        </label>
+
+        <label>
+          Min Mileage (km)
+          <input
+            name="min_mileage"
+            type="number"
+            min="0"
+            value={filterInputs.mileageMin}
+            onChange={(event) => updateFilterInput("mileageMin", event.target.value)}
+            placeholder="Optional…"
+          />
+        </label>
+
+        <label>
+          Max Mileage (km)
+          <input
+            name="max_mileage"
+            type="number"
+            min="0"
+            value={filterInputs.mileageMax}
+            onChange={(event) => updateFilterInput("mileageMax", event.target.value)}
             placeholder="Optional…"
           />
         </label>
 
         <label>
           Sort
-          <select name="sort" value={sortKey} onChange={(event) => setSortKey(event.target.value)}>
+          <select
+            name="sort"
+            value={sortKey}
+            onChange={(event) => {
+              setSortKey(event.target.value);
+              setPage(1);
+            }}
+          >
             <option value="newest">Newest</option>
             <option value="priceAsc">Price: Low to High</option>
             <option value="priceDesc">Price: High to Low</option>
@@ -155,43 +312,54 @@ export default function PublicListingsPage() {
           </select>
         </label>
 
-        <button className="button" type="button" onClick={loadListings}>
+        <button className="button" type="submit">
+          Apply Filters
+        </button>
+
+        <button className="button button-subtle" type="button" onClick={clearFilters}>
+          Clear
+        </button>
+
+        <button className="button button-subtle" type="button" onClick={refreshListings}>
           Refresh
         </button>
-      </div>
+      </form>
 
       {error && <Notice kind="error">{error}</Notice>}
 
       {loading && <p className="muted">Loading Listings…</p>}
 
-      {!loading && filteredListings.length === 0 && (
+      {!loading && listings.length === 0 && page === 1 && (
         <Notice kind="info">No listings match your current filters.</Notice>
+      )}
+      {!loading && listings.length === 0 && page > 1 && (
+        <Notice kind="info">No more listings on this page. Try Previous or refine your filters.</Notice>
       )}
 
       <div className="listing-grid">
-        {pagedListings.map((listing) => (
+        {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} actions={[]} />
         ))}
       </div>
 
-      {!loading && filteredListings.length > 0 && (
+      {!loading && (listings.length > 0 || page > 1) && (
         <div className="pagination-bar">
           <button
             className="button button-subtle"
             type="button"
-            disabled={currentPage <= 1}
+            disabled={page <= 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
           >
             Previous
           </button>
           <p className="muted">
-            Page {currentPage} of {totalPages}
+            Page {page} ({listings.length} results)
           </p>
           <button
             className="button button-subtle"
             type="button"
-            disabled={currentPage >= totalPages}
-            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+            disabled={!hasNextPage || listings.length < pageLimit}
+            onClick={() => setPage((current) => current + 1)}
           >
             Next
           </button>
