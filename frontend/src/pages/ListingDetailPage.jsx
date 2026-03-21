@@ -6,7 +6,7 @@ import { listingsApi } from "../api/client";
 
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL
   ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "")
-  : "http://localhost:3001";
+  : "http://localhost:3000";
 
 function toCurrency(value) {
   if (value === null || value === undefined || value === "") {

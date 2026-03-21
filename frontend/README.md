@@ -24,6 +24,6 @@ This frontend was generated from `IMPLEMENTATION_PLAN.md` and the backend implem
 
 Expected backend base URL:
 
-- `http://localhost:3001/api/v1`
+- `http://localhost:3000/api/v1`
 
 If your backend runs elsewhere, set `VITE_API_BASE_URL` in `.env`.
