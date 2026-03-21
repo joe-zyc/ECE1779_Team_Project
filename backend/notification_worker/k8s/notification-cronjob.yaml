@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: buyer-notification-job
+spec:
+  schedule: "0 9 * * *"   # every day at 9:00 AM
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+
+          containers:
+            - name: notification-worker
+              image: YOUR_DOCKER_IMAGE:latest
+
+              command: ["node", "notification-worker/index.js"]
+
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: DATABASE_URL
+
+                - name: SENDGRID_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: SENDGRID_API_KEY
+
+                - name: SENDGRID_FROM_EMAIL
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: SENDGRID_FROM_EMAIL
+
+                - name: APP_BASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: APP_BASE_URL
