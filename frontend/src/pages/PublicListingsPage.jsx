@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import ListingCard from "../components/ListingCard";
 import Notice from "../components/Notice";
@@ -18,6 +18,16 @@ const initialFilters = {
   priceMin: "",
   priceMax: "",
 };
+
+function normalizeFilters(filters) {
+  const normalized = { ...initialFilters };
+
+  Object.keys(initialFilters).forEach((key) => {
+    normalized[key] = String(filters?.[key] ?? "").trim();
+  });
+
+  return normalized;
+}
 
 function toLikePattern(value) {
   const trimmed = String(value || "").trim();
@@ -81,8 +91,13 @@ export default function PublicListingsPage() {
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(PAGE_SIZE);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const latestRequestRef = useRef(0);
 
   const loadListings = useCallback(async () => {
+    const requestId = latestRequestRef.current + 1;
+    latestRequestRef.current = requestId;
+
     setLoading(true);
     setError("");
 
@@ -92,19 +107,28 @@ export default function PublicListingsPage() {
       const apiLimit = Number(response?.pagination?.limit);
       const safeLimit = Number.isFinite(apiLimit) && apiLimit > 0 ? apiLimit : PAGE_SIZE;
 
+      if (requestId !== latestRequestRef.current) {
+        return;
+      }
+
       setListings(nextListings);
       setPageLimit(safeLimit);
       setHasNextPage(nextListings.length >= safeLimit);
     } catch (loadError) {
+      if (requestId !== latestRequestRef.current) {
+        return;
+      }
       setError(loadError.message || "Failed to load listings.");
     } finally {
-      setLoading(false);
+      if (requestId === latestRequestRef.current) {
+        setLoading(false);
+      }
     }
   }, [activeFilters, page, sortKey]);
 
   useEffect(() => {
     loadListings();
-  }, [loadListings]);
+  }, [loadListings, refreshTick]);
 
   function updateFilterInput(field, value) {
     setFilterInputs((current) => ({ ...current, [field]: value }));
@@ -112,8 +136,11 @@ export default function PublicListingsPage() {
 
   function applyFilters(event) {
     event.preventDefault();
-    setActiveFilters({ ...filterInputs });
+    const normalizedFilters = normalizeFilters(filterInputs);
+    setFilterInputs(normalizedFilters);
+    setActiveFilters(normalizedFilters);
     setPage(1);
+    setRefreshTick((current) => current + 1);
   }
 
   function clearFilters() {
@@ -121,6 +148,15 @@ export default function PublicListingsPage() {
     setFilterInputs(resetFilters);
     setActiveFilters(resetFilters);
     setPage(1);
+    setRefreshTick((current) => current + 1);
+  }
+
+  function refreshListings() {
+    const normalizedFilters = normalizeFilters(filterInputs);
+    setFilterInputs(normalizedFilters);
+    setActiveFilters(normalizedFilters);
+    setPage(1);
+    setRefreshTick((current) => current + 1);
   }
 
   return (
@@ -284,7 +320,7 @@ export default function PublicListingsPage() {
           Clear
         </button>
 
-        <button className="button button-subtle" type="button" onClick={loadListings}>
+        <button className="button button-subtle" type="button" onClick={refreshListings}>
           Refresh
         </button>
       </form>
