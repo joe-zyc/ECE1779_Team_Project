@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: openmotor-frontend
-          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-frontend:1.0.1
+          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-frontend:${FRONTEND_TAG}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
