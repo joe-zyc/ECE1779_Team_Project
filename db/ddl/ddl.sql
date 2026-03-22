@@ -63,12 +63,4 @@ CREATE TABLE IF NOT EXISTS buyer_preferences (
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS listing_notifications (
-  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id        UUID NOT NULL REFERENCES car_listings(id) ON DELETE CASCADE,
-  buyer_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  sent_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (listing_id, buyer_id)
-);
-
 COMMIT;

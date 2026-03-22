@@ -2,8 +2,6 @@ const { Pool } = require("pg");
 const path = require("path");
 const { env } = require("../../config/env");
 
-//const { notifyMatchingBuyers } = require("../../services/notification.service");
-
 const pool = new Pool({
   host: env.dbHost,
   port: env.dbPort,
@@ -369,8 +367,6 @@ const publishListing = async (req, res, next) => {
     }
 
     const listing = result.rows[0];
-
-    await notifyMatchingBuyers(listing);
 
     res.json({ data: listing });
   } catch (err) {
