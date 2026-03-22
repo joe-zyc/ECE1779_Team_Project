@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: openmotor-backend
-          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-backend:${BACKEND_TAG}
+          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-backend:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -49,9 +49,9 @@ spec:
                   name: openmotor-backend-secret
                   key: JWT_REFRESH_SECRET
             - name: ACCESS_TOKEN_TTL
-              value: "900"
+              value: "15m"
             - name: REFRESH_TOKEN_TTL
-              value: "604800"
+              value: "7d"
             - name: AUTO_FLAG_THRESHOLD
               value: "3"
             - name: UPLOAD_DIR
