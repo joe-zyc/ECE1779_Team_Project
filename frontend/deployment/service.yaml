@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: openmotor-frontend-service
 spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
   selector:
     app: openmotor-frontend
   ports:

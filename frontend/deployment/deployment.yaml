@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
         - name: openmotor-frontend
-          image: openmotor-frontend:latest
+          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-frontend:1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:
             - name: VITE_API_BASE_URL
-              value: "http://openmotor-backend-service:3000/api/v1"
+              value: "http://209.38.10.229:3000/api/v1"
             - name: PORT
               value: "8080"
           

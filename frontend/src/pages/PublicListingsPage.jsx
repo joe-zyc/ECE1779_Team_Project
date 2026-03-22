@@ -5,6 +5,45 @@ import Notice from "../components/Notice";
 import { listingsApi } from "../api/client";
 
 const PAGE_SIZE = 5;
+const CAR_MAKER_OPTIONS = [
+  "Acura",
+  "Alfa Romeo",
+  "Audi",
+  "BMW",
+  "Buick",
+  "Cadillac",
+  "Chevrolet",
+  "Chrysler",
+  "Dodge",
+  "Fiat",
+  "Ford",
+  "Genesis",
+  "GMC",
+  "Honda",
+  "Hyundai",
+  "Infiniti",
+  "Jaguar",
+  "Jeep",
+  "Kia",
+  "Land Rover",
+  "Lexus",
+  "Lincoln",
+  "Mazda",
+  "Mercedes-Benz",
+  "Mini",
+  "Mitsubishi",
+  "Nissan",
+  "Porsche",
+  "Ram",
+  "Subaru",
+  "Tesla",
+  "Toyota",
+  "Volkswagen",
+  "Volvo",
+];
+const BODY_TYPE_OPTIONS = ["Sedan", "SUV", "Hatchback", "Coupe", "Convertible", "Truck", "Van", "Wagon"];
+const COLOR_OPTIONS = ["Black", "White", "Silver", "Gray", "Blue", "Red", "Green", "Brown", "Beige", "Orange", "Yellow"];
+
 const initialFilters = {
   make: "",
   model: "",
@@ -79,6 +118,70 @@ function buildQueryParams(filters, sortKey, page) {
     priceMin: toNumericFilter(filters.priceMin),
     priceMax: toNumericFilter(filters.priceMax),
   };
+}
+
+function SuggestionInput({ label, name, value, onChange, options, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    function handleOutsideClick(event) {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const normalizedValue = String(value || "").trim().toLowerCase();
+  const visibleOptions = options
+    .filter((option) => option.toLowerCase().includes(normalizedValue))
+    .slice(0, 8);
+
+  return (
+    <label>
+      {label}
+      <div className="suggestion-input" ref={wrapperRef}>
+        <input
+          name={name}
+          type="text"
+          value={value}
+          onChange={(event) => {
+            onChange(event.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setIsOpen(false);
+            }
+          }}
+          placeholder={placeholder}
+          autoComplete="off"
+        />
+        {isOpen && visibleOptions.length > 0 && (
+          <div className="suggestion-menu" role="listbox" aria-label={`${label} suggestions`}>
+            {visibleOptions.map((option) => (
+              <button
+                key={option}
+                type="button"
+                className="suggestion-option"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </label>
+  );
 }
 
 export default function PublicListingsPage() {
@@ -167,16 +270,14 @@ export default function PublicListingsPage() {
       </div>
 
       <form className="control-strip" onSubmit={applyFilters}>
-        <label>
-          Make
-          <input
-            name="make"
-            type="text"
-            value={filterInputs.make}
-            onChange={(event) => updateFilterInput("make", event.target.value)}
-            placeholder="e.g. Toyota"
-          />
-        </label>
+        <SuggestionInput
+          label="Make"
+          name="make"
+          value={filterInputs.make}
+          onChange={(value) => updateFilterInput("make", value)}
+          options={CAR_MAKER_OPTIONS}
+          placeholder="Select or type"
+        />
 
         <label>
           Model
@@ -200,27 +301,23 @@ export default function PublicListingsPage() {
           />
         </label>
 
-        <label>
-          Body Type
-          <input
-            name="body_type"
-            type="text"
-            value={filterInputs.bodyType}
-            onChange={(event) => updateFilterInput("bodyType", event.target.value)}
-            placeholder="e.g. SUV"
-          />
-        </label>
+        <SuggestionInput
+          label="Body Type"
+          name="body_type"
+          value={filterInputs.bodyType}
+          onChange={(value) => updateFilterInput("bodyType", value)}
+          options={BODY_TYPE_OPTIONS}
+          placeholder="Select or type"
+        />
 
-        <label>
-          Color
-          <input
-            name="color"
-            type="text"
-            value={filterInputs.color}
-            onChange={(event) => updateFilterInput("color", event.target.value)}
-            placeholder="e.g. Blue"
-          />
-        </label>
+        <SuggestionInput
+          label="Color"
+          name="color"
+          value={filterInputs.color}
+          onChange={(value) => updateFilterInput("color", value)}
+          options={COLOR_OPTIONS}
+          placeholder="Select or type"
+        />
 
         <label>
           Min Price (CAD)

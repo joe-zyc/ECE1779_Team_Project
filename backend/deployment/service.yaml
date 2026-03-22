@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: openmotor-backend-service
 spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
   selector:
     app: openmotor-backend
   ports:

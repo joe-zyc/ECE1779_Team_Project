@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: openmotor-backend
-          image: openmotor-backend:latest
+          image: registry.digitalocean.com/ece1779-team26-cr/openmotor-backend:1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
