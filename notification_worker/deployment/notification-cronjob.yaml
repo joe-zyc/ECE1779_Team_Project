@@ -1,43 +1,37 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: buyer-notification-job
+  name: openmotor-notification-worker
 spec:
-  schedule: "0 9 * * *"   # every day at 9:00 AM
+  schedule: "0 9 * * *"
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
-
   jobTemplate:
     spec:
       template:
         spec:
           restartPolicy: OnFailure
-
           containers:
             - name: openmotor-notification-worker
-              image: openmotor-notification-worker:latest
-
+              image: registry.digitalocean.com/ece1779-team26-cr/openmotor-worker:v2
+              imagePullPolicy: Always
               command: ["node", "index.js"]
-
               env:
                 - name: DATABASE_URL
                   valueFrom:
                     secretKeyRef:
                       name: openmotor-notification-secret
                       key: DATABASE_URL
-
                 - name: SENDGRID_API_KEY
                   valueFrom:
                     secretKeyRef:
                       name: openmotor-notification-secret
                       key: SENDGRID_API_KEY
-
                 - name: SENDGRID_FROM_EMAIL
                   valueFrom:
                     secretKeyRef:
                       name: openmotor-notification-secret
                       key: SENDGRID_FROM_EMAIL
-
                 - name: APP_BASE_URL
                   valueFrom:
                     secretKeyRef:
