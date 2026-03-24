@@ -50,13 +50,9 @@ async function fetchMatches(client) {
       ON u.id = bp.buyer_id
      AND u.role = 'buyer'
      AND u.is_active = TRUE
-    LEFT JOIN listing_notifications ln
-      ON ln.listing_id = l.id
-     AND ln.buyer_id = u.id
     WHERE l.status = 'published'
       AND l.published_at IS NOT NULL
       AND l.published_at >= NOW() - INTERVAL '24 hours'
-      AND ln.id IS NULL
       AND (bp.make IS NULL OR LOWER(bp.make) = LOWER(l.make))
       AND (bp.model IS NULL OR LOWER(bp.model) = LOWER(l.model))
       AND (bp.year_min IS NULL OR l.year >= bp.year_min)
