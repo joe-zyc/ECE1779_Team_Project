@@ -54,7 +54,7 @@ The report should clearly and concisely cover the following aspects:
 
 2. **Motivation**
 
-  We chose this project because everyone has used websites like AutoTrader or FB Marketplace to browse for and buy used vehicles and we have all faced similar experiences with private dealers, excessive ads and spam, leading to an inefficient and unsatisfactory experience. OpenMotor was created to address these problems, and create an easy, safe and efficient used car marketplace, for both buyers and sellers. 
+  We chose this project because everyone has used websites like AutoTrader or FB Marketplace to browse for and buy used vehicles and we have all faced similar experiences with private dealers, excessive ads and spam, leading to an inefficient and unsatisfactory experience. OpenMotor was created to address these problems and create an easy, safe and efficient used car marketplace, for both buyers and sellers. 
   
 3. **Objectives**
 
@@ -65,4 +65,26 @@ The application consists of
 - a backend built with Node.js and Express
 - a PostgreSQL database for stateful data storage
 - an Email Notification Service to send matched listings to users.
+
 This application is deployed on a Kubernetes cluster using Docker containers with DigitalOcean infrastructure.
+
+5. **Features**
+
+The course requirements include: Containerization and Local Development, State Management, Deployment Provider, Orchestration Approach, Monitoring and Observability, and 2 Advanced Features.
+
+What we did... 
+-  Containerization and Local Development = Docker + Docker Compose
+-  State Management = PostgreSQL + DigitalOcean Volumes (persistent storage)
+-  Deployment Provider = Digital Ocean
+-  Orchestration Approach = Kubernetes
+-  Monitoring and Observability = DigitalOcean monitoring tools
+-  Advanced Features #1 = User Authentication and Authorization
+-  Advanced Features #2 = Email Notifications for Buyers
+
+7. **User Guide**
+
+8. **Development Guide**
+
+9. **Deployment Information**
+
+10. **AI Assistance & Verification**
