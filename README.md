@@ -44,42 +44,42 @@ The report should clearly and concisely cover the following aspects:
 
 1. **Team Information**
 
-  Noubar Nakhnikian - 1002995100 - noubar.nakhnikian@mail.utoronto.ca
-  
-  Yujie Qin - 1000703839 - email@email.com
-  
-  Yuechen Zhang - 1004810074 - email@email.com
-  
-  Tianchi Chen - 1003224799 - email@email.com
+          Noubar Nakhnikian - 1002995100 - noubar.nakhnikian@mail.utoronto.ca
+          
+          Yujie Qin - 1000703839 - email@email.com
+          
+          Yuechen Zhang - 1004810074 - email@email.com
+          
+          Tianchi Chen - 1003224799 - email@email.com
 
 2. **Motivation**
 
-  We chose this project because everyone has used websites like AutoTrader or FB Marketplace to browse for and buy used vehicles and we have all faced similar experiences with private dealers, excessive ads and spam, leading to an inefficient and unsatisfactory experience. OpenMotor was created to address these problems and create an easy, safe and efficient used car marketplace, for both buyers and sellers. 
+        We chose this project because everyone has used websites like AutoTrader or FB Marketplace to browse for and buy used vehicles and we have all faced similar experiences with private dealers, excessive ads and spam, leading to an inefficient and unsatisfactory experience. OpenMotor was created to address these problems and create an easy, safe and efficient used car marketplace, for both buyers and sellers. 
   
 3. **Objectives**
 
 4. **Technical Stack**
    
-The application consists of 
-- a frontend built with React
-- a backend built with Node.js and Express
-- a PostgreSQL database for stateful data storage
-- an Email Notification Service to send matched listings to users.
-
-This application is deployed on a Kubernetes cluster using Docker containers with DigitalOcean infrastructure.
+        The application consists of 
+        - a frontend built with React
+        - a backend built with Node.js and Express
+        - a PostgreSQL database for stateful data storage
+        - an Email Notification Service to send matched listings to users.
+        
+        This application is deployed on a Kubernetes cluster using Docker containers with DigitalOcean infrastructure.
 
 5. **Features**
 
-The course requirements include: Containerization and Local Development, State Management, Deployment Provider, Orchestration Approach, Monitoring and Observability, and 2 Advanced Features.
-
-What we did... 
--  Containerization and Local Development = Docker + Docker Compose
--  State Management = PostgreSQL + DigitalOcean Volumes (persistent storage)
--  Deployment Provider = Digital Ocean
--  Orchestration Approach = Kubernetes
--  Monitoring and Observability = DigitalOcean monitoring tools
--  Advanced Features #1 = User Authentication and Authorization
--  Advanced Features #2 = Email Notifications for Buyers
+        The course requirements include: Containerization and Local Development, State Management, Deployment Provider, Orchestration Approach, Monitoring and Observability, and 2 Advanced Features.
+        
+        What we did... 
+        -  Containerization and Local Development = Docker + Docker Compose
+        -  State Management = PostgreSQL + DigitalOcean Volumes (persistent storage)
+        -  Deployment Provider = Digital Ocean
+        -  Orchestration Approach = Kubernetes
+        -  Monitoring and Observability = DigitalOcean monitoring tools
+        -  Advanced Features #1 = User Authentication and Authorization
+        -  Advanced Features #2 = Email Notifications for Buyers
 
 7. **User Guide**
 
