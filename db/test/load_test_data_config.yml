@@ -3,12 +3,12 @@ data_dir: .
 database:
   # Option A: full URL (preferred). Leave empty to use host/port/name/user/password below.
   # url: "postgresql://postgres:postgres@localhost:5432/postgres"
-  url: "postgresql://test_user:test_pass@localhost:5433/test_db"
+  url: "postgresql://test_user:test_pass@localhost:5432/test_db"
   host: "localhost"
   port: 5432
-  name: "postgres"
-  user: "postgres"
-  password: ""
+  name: "test_db"
+  user: "test_user"
+  password: "test_pass"
 
 options:
   truncate_before_load: false

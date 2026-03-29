@@ -2,9 +2,6 @@
 
 ## Session 1: DB Test Data Generation and Ingestion Script
 
-### Context
-We would like to utilize AI to help us generate test data for our application, which saves us time and effort in creating realistic data for testing our backend API and frontend UI. We also want to create a Python script that can load this generated test data into our PostgreSQL database, ensuring that the data is consistent with our database schema and relationships.
-
 ### Prompt
 
 ```
@@ -54,9 +51,6 @@ no duplicate IDs / invalid enum values in the generated data
 
 ## Session 2: Backend API skeleton
 
-### Context
-We want to create a template structure as our starting codebase for our backend API development. This helps the team to develop the workload, and also sketched out a clear structure for the backend codebase, which makes it easier for us to collaborate and maintain the code in the future. We did not ask the AI to implement the API endpoints, but just to create a template structure for us to work on.
-
 ### Prompt
 ```
 based on IMPLEMENTATION_PLAN.md  generate backend template structure inside the backend folder. Do not implement the api, just put a template
@@ -90,9 +84,6 @@ scripts: start, check.
 - We removed the excess dependencies and adjusted the codebase to ensure that it was aligned with our implementation plan. To verify the correctness, our team setup a discussion to review the architecture and structure of the backend codebase, ensuring that it was organized in a way that facilitated development and maintenance. We also ran the backend server to confirm that it started successfully without any errors, which indicated that the template structure was correctly set up.
 
 ## Session 3: Frontend UI Generation
-
-### Context
-Since our team does not have much experience in frontend development, we leveraged AI to help us generate the UI for our application. We provided the AI with a summary of our backend API endpoints, as well as an overview of the features we wanted to implement in our frontend. We also included an Agent prompt for frontend development, which outlined the guidelines and best practices for frontend development that we wanted the AI to follow when generating the UI.
 
 ### Prompt
 ```
