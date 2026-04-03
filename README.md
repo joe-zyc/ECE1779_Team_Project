@@ -1,6 +1,7 @@
 # ECE1779 Project Report Team 26 - OpenMotor
 
-Demo Video At: https://www.youtube.com/watch?v=heazmL86sIQ
+## Demo Video
+https://www.youtube.com/watch?v=heazmL86sIQ
 
 ## 1. Team Information
 
