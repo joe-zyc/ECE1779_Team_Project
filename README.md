@@ -18,28 +18,76 @@ We chose this project because everyone has used websites like AutoTrader or FB M
 
 ## 3. Objectives
 
+The objective of this project is to develop a secure, scalable, and high-performance cloud-based vehicle trading platform that provides individuals with a faster and safer way to buy and sell vehicles.
+- The platform will incorporate a customizable search and preference-matching system to enhance discovery efficiency and user experience.
+- It will support structured listing lifecycle management with controlled status transitions (draft, published, flagged, removed), enforce strong data validation rules and implement role-based access control to ensure proper ownership.
+- The system will also support multi-photo uploads with correctly stored and linked metadata.
+- In addition, it will deliver reliable browsing, filtering, sorting, and pagination capabilities with deterministic results and accurate metadata.
+- There will be two advanced features implemented: user authentication and authorization to provide secure access control, and email notifications for buyers to alert them of new listings matching their preferences.
+
+Overall, the project aims to build a cloud-native marketplace solution that emphasizes security, scalability, data integrity and user-centered design.
+
+
 ## 4. Technical Stack
    
-The application consists of 
-- a frontend built with React
-- a backend built with Node.js and Express
-- a PostgreSQL database for stateful data storage
-- an Email Notification Service to send matched listings to users.
+#### Deployment provider
+- We use DigitalOcean Droplet VMs to host the application.
+- DigitalOcean Volumes were attached to store persistent data such as PostgreSQL data and user-uploaded images.
 
-This application is deployed on a Kubernetes cluster using Docker containers with DigitalOcean infrastructure.
+#### Orchestration with Kubernetes
+- We utilized Kubernetes to orchestrate the application components, including the frontend, backend, database, and background worker for email notifications.
+- Kubernetes services were also used to manage communication between the components and ensure scalability and reliability.
+
+#### Backend Service with Node.js and Express
+- The backend API was implemented using Node.js and Express framework.
+- The backend service was designed to contain authentication and routing to handle user requests from different roles (buying or selling cars)
+
+#### Frontend Service with React
+- React was used to build the frontend service for user interaction.
+
+#### Persistent Storage with DigitalOcean Volumes
+- DigitalOcean Volumes were chosen for our persistent storage using Persistent Volume Chains (PVCs).
+- One PVC was set up to store PostgreSQL data.
+- A second PVC was set up to store user-uploaded images for car listings.
+
+#### Monitoring Setup
+- DigitalOcean monitoring tools are used to track CPU usage and application health across the DigitalOcean Droplets and the Kubernetes cluster.
+
+#### Advanced Feature 1: User Authentication and Authorization 
+- User registration and login functionality were implemented using JWT for secure authentication.
+- RBAC was implemented to restrict API access based on user roles.
+- We ensured that, based on their roles as either buyers or sellers, users only see the webpage relevant to them.
+- A database schema was designed to store user authentication and role information.
+
+#### Advanced Feature 2: Email Notifications for Buyers:
+- A database schema was created to store buyer preferences for car models and target prices used to trigger email notifications.
+- A notification worker service was deployed as a Kubernetes CronJob scheduled to run once per day.
+- A third-party email service provider (SendGrid) was integrated to handle email sending and ensure reliable delivery.
+
 
 ## 5. Features
 
-The course requirements include: Containerization and Local Development, State Management, Deployment Provider, Orchestration Approach, Monitoring and Observability, and 2 Advanced Features.
+OpenMotor has a variety of features available to make the buying or selling experience on the site easier and more efficient. 
 
-What we did... 
--  Containerization and Local Development = Docker + Docker Compose
--  State Management = PostgreSQL + DigitalOcean Volumes (persistent storage)
--  Deployment Provider = Digital Ocean
--  Orchestration Approach = Kubernetes
--  Monitoring and Observability = DigitalOcean monitoring tools
--  Advanced Features #1 = User Authentication and Authorization
--  Advanced Features #2 = Email Notifications for Buyers
+#### Seller Listing Management
+- Sellers can create, edit, publish, unpublish, and manage vehicle listings with controlled status transitions (draft, published, flagged, removed).
+- Each listing includes vehicle details, contact information, and vehicle photos uploaded by the seller.
+- The system validates year, price and mileage, required fields before publishing, and image type/size limits.
+- Sellers have full CRUD access to their own listings only, and uploaded photos are properly stored with linked metadata.
+
+#### Buyer Search and Discovery
+- Buyers can browse published listings and search efficiently using filters such as make, model, year range, price range, mileage etc.
+- Buyers can sort results (newest, price ascending/descending, year), paginate through listings, and view detailed pages.
+- The system ensures filter results are deterministic, pagination metadata remains accurate, and removed listings never appear in public searches.
+
+#### User Authentication and Authorization (Advanced Feature 1)
+- Users can signup as either buyers or sellers. Based on the user role, the application will provide different frontend interfaces and restrict access to certain API endpoints.
+- Users can login to the system using their credentials, and the system will use JWT for secure authentication and session management.
+
+#### Email Notifications for Buyers (Advanced Feature 2)
+- Buyers can setup notification alerts for specific used-car models with a target price.
+- The email notification runs on a cadence of once every day, where the system will automatically send an to the email containing all the new listings of that day that match the users requested criteria.
+
 
 ## 6. User Guide
 
