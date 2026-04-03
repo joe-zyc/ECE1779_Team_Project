@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:17
+    container_name: openmotor-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/ddl/ddl.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      openmotor-network:
+        aliases:
+          - openmotor-db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: openmotor-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3000
+      API_BASE_PATH: /api/v1
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ACCESS_TOKEN_TTL: 15m
+      REFRESH_TOKEN_TTL: 7d
+      AUTO_FLAG_THRESHOLD: 3
+      UPLOAD_DIR: /storage/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - backend_uploads:/storage/uploads
+    networks:
+      - openmotor-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: openmotor-frontend
+    depends_on:
+      - backend
+    environment:
+      PORT: 8080
+      VITE_API_BASE_URL: http://localhost:3000/api/v1
+    ports:
+      - "8080:8080"
+    networks:
+      - openmotor-network
+
+networks:
+  openmotor-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  backend_uploads:

@@ -193,6 +193,15 @@ All seller actions are accessible from the Seller Hub.
 
 ## 7. Development Guide
 
+### Run With Docker Compose
+Create a `.env` file in the root directory with the necessary environment variables (see `.env.example` for reference), then run:
+```bash
+docker-compose up --build
+
+## Or run with
+docker-compose --env-file .env.example up --build
+```
+
 ### Database Setup
 
 Navigate to the `db` directory.
